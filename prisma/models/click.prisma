@@ -1,6 +1,6 @@
 model Click {
-  id        String   @id @map("_id")
-  dealId    String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId()
+  dealId    String   @db.ObjectId
   userId    String
   timestamp DateTime @default(now())
 

@@ -4,7 +4,7 @@ enum DiscountType {
 }
 
 model Coupon {
-  id           String       @id @map("_id")
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId()
   title        String
   code         String
   discountType DiscountType
@@ -12,7 +12,7 @@ model Coupon {
   affiliateUrl String
   expriryDate  DateTime
   isActive     Boolean      @default(false)
-  createdBy    String
+  createdBy    String       @db.ObjectId
 
   creater Admin @relation("couponcreateBy", fields: [createdBy], references: [id], onDelete: Cascade)
 

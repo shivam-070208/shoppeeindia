@@ -1,8 +1,8 @@
 model Store {
-  id      String @id @map("_id")
-  name    String
+  id      String @id @default(auto()) @map("_id") @db.ObjectId()
+  name    String @unique
   logoUrl String
-  slug    String
+  slug    String @unique
 
   deals Deal[] @relation("DealStore")
 

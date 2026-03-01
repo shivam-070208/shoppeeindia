@@ -1,5 +1,5 @@
 import { httpBatchLink } from "@trpc/client";
-import { appRouter } from "./index";
+import { appRouter } from "@/_trpc/server/router";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 

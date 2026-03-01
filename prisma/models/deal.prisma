@@ -1,5 +1,5 @@
 model Deal {
-  id              String @id @map("_id")
+  id              String @id @default(auto()) @map("_id") @db.ObjectId()
   slug            String @unique
   imageUrl        String
   originalPrice   Int
@@ -7,14 +7,15 @@ model Deal {
   discountPercent Int
   affiliateUrl    String
 
-  storeId    String
-  categories Category[]
-  createdBy  String
+  storeId    String   @db.ObjectId
+  categoryId String   @db.ObjectId
+  createdBy  String   @db.ObjectId
   expiryDate DateTime
 
   store       Store        @relation("DealStore", fields: [storeId], references: [id], onDelete: Cascade)
   creator     Admin        @relation("DealCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
-  favourite   Favourite[]
+  favourites  Favourite[]  @relation("DealFavourites")
+  category    Category     @relation("DealsCategory", fields: [categoryId], references: [id])
   priceAlerts PriceAlert[]
   clicks      Click[]
 

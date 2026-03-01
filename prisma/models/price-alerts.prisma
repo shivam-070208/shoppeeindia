@@ -1,7 +1,7 @@
 model PriceAlert {
-  id          String  @id @map("_id")
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId()
   userId      String
-  dealId      String
+  dealId      String  @db.ObjectId
   targetPrice Int
   isNotified  Boolean @default(false)
 

@@ -1,12 +1,12 @@
 model Category {
-  id   String @id @map("_id")
-  name String
-  slug String
+  id   String @id @default(auto()) @map("_id") @db.ObjectId()
+  name String @unique
+  slug String @unique
+
+  deal Deal[] @relation("DealsCategory")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  deal      Deal?    @relation(fields: [dealId], references: [id])
-  dealId    String?
 
   @@map("category")
 }

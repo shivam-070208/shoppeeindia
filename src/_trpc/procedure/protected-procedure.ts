@@ -1,5 +1,5 @@
 import { getServerSession } from "@/lib/auth-utils";
-import { baseProcedure } from "../../init";
+import { baseProcedure } from "../init";
 import { TRPCError } from "@trpc/server";
 
 export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
