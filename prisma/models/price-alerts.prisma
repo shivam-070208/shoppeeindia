@@ -1,0 +1,15 @@
+model PriceAlert {
+  id          String  @id @map("_id")
+  userId      String
+  dealId      String
+  targetPrice Int
+  isNotified  Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("pricealerts")
+}

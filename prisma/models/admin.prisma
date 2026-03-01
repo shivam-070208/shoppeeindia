@@ -1,0 +1,14 @@
+model Admin {
+  id           String  @id @map("_id")
+  userId       String  @unique
+  isSuperAdmin Boolean @default(false)
+
+  user    User     @relation("adminuser", fields: [userId], references: [id], onDelete: Cascade)
+  coupons Coupon[] @relation("couponcreateBy")
+  deals   Deal[]   @relation("DealCreatedBy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admin")
+}

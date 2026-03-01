@@ -1,0 +1,10 @@
+model Favourite {
+  id     String @id @map("_id")
+  dealId String
+  userId String
+
+  user User @relation("favouriteDeals", fields: [userId], references: [id], onDelete: Cascade)
+  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@map("favourite")
+}

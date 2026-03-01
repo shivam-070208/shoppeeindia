@@ -1,0 +1,20 @@
+model User {
+  id            String   @id @map("_id")
+  name          String
+  email         String
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  admin          Admin?      @relation("adminuser")
+  sessions       Session[]
+  accounts       Account[]
+  favouriteDeals Favourite[] @relation("favouriteDeals")
+
+  priceAlerts PriceAlert[]
+  clicks      Click[]
+
+  @@unique([email])
+  @@map("user")
+}
