@@ -1,0 +1,25 @@
+model Deal {
+  id              String @id @map("_id")
+  slug            String @unique
+  imageUrl        String
+  originalPrice   Int
+  dealPrice       Int
+  discountPercent Int
+  affiliateUrl    String
+
+  storeId    String
+  categories Category[]
+  createdBy  String
+  expiryDate DateTime
+
+  store       Store        @relation("DealStore", fields: [storeId], references: [id], onDelete: Cascade)
+  creator     Admin        @relation("DealCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+  favourite   Favourite[]
+  priceAlerts PriceAlert[]
+  clicks      Click[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("deal")
+}

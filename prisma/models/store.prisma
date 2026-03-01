@@ -1,0 +1,13 @@
+model Store {
+  id      String @id @map("_id")
+  name    String
+  logoUrl String
+  slug    String
+
+  deals Deal[] @relation("DealStore")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("store")
+}
