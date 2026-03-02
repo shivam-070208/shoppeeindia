@@ -1,10 +1,12 @@
 model Favourite {
-  id     String @id @map("_id")
-  dealId String
+  id     String @id @default(auto()) @map("_id") @db.ObjectId()
+  dealId String @db.ObjectId
   userId String
 
-  user User @relation("favouriteDeals", fields: [userId], references: [id], onDelete: Cascade)
-  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  user      User     @relation("favouriteDeals", fields: [userId], references: [id], onDelete: Cascade)
+  deal      Deal     @relation("DealFavourites", fields: [dealId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("favourite")
 }

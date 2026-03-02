@@ -1,5 +1,5 @@
 model Admin {
-  id           String  @id @map("_id")
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId()
   userId       String  @unique
   isSuperAdmin Boolean @default(false)
 
