@@ -1,11 +1,11 @@
-import { createTRPCRouter } from "@/_trpc/init";
+import { baseProcedure, createTRPCRouter } from "@/_trpc/init";
 import { adminProtectedProcedure } from "@/_trpc/procedure/admin-procedure";
 import { slugify } from "@/utils/slugify";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 
 export const storeRouter = createTRPCRouter({
-  list: adminProtectedProcedure.query(async () => {
+  list: baseProcedure.query(async () => {
     return prisma.store.findMany({
       orderBy: { createdAt: "desc" },
     });
