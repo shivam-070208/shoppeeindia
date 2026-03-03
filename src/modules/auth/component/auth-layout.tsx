@@ -10,6 +10,8 @@ import {
 import Link from "next/link";
 import LogoIcon from "@/components/common/logo-icon";
 import { ORGANISATION_NAME } from "@/config/contants";
+import { Button } from "@/components/ui/button";
+import { FcGoogle } from "react-icons/fc";
 
 type AuthLayoutProps = {
   children: React.ReactNode;
@@ -30,7 +32,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, authType }) => {
       </div>
       <Card className="bg-card-secondary w-full max-w-md rounded-3xl border shadow-lg">
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="text-xl">
             {authType === "login" ? "Welcome Back" : "Create Your Account"}
           </CardTitle>
           <CardDescription>
@@ -39,7 +41,24 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, authType }) => {
               : "Fill in the details below to create a new account."}
           </CardDescription>
         </CardHeader>
-        <CardContent>{children}</CardContent>
+        <CardContent>
+          {children}
+
+          <div className="relative mt-12 flex items-center justify-center">
+            <div className="bg-muted-foreground/40 absolute top-1/2 z-0 h-[0.8px] w-full" />
+            <span className="text-muted-foreground bg-card-secondary static z-1 mx-2 p-2 text-sm">
+              or continue with
+            </span>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full py-6 font-medium"
+          >
+            <FcGoogle />
+            <span>Continue with Google</span>
+          </Button>
+        </CardContent>
       </Card>
       <div>
         {authType === "login" ? (

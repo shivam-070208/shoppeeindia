@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Form,
@@ -11,8 +10,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { ArrowRight } from "lucide-react";
-
+import { ArrowRight, MailIcon, LockIcon } from "lucide-react";
+import { InputWithIcon } from "@/components/ui/input-with-icon";
 type LoginFormInputs = {
   email: string;
   password: string;
@@ -55,13 +54,14 @@ const LoginForm: React.FC = () => {
             <FormItem>
               <Label htmlFor="email">Email</Label>
               <FormControl>
-                <Input
+                <InputWithIcon
                   id="email"
                   type="email"
                   {...field}
                   disabled={isSubmitting}
                   autoComplete="email"
                   placeholder="you@example.com"
+                  icon={<MailIcon size={20} />}
                 />
               </FormControl>
               <FormMessage />
@@ -82,13 +82,14 @@ const LoginForm: React.FC = () => {
             <FormItem>
               <Label htmlFor="password">Password</Label>
               <FormControl>
-                <Input
+                <InputWithIcon
                   id="password"
                   type="password"
                   {...field}
                   disabled={isSubmitting}
                   autoComplete="current-password"
                   placeholder="Password"
+                  icon={<LockIcon size={20} />}
                 />
               </FormControl>
               <FormMessage />
@@ -97,7 +98,7 @@ const LoginForm: React.FC = () => {
         />
         <Button
           type="submit"
-          className="w-full cursor-pointer rounded-full py-6 font-semibold"
+          className="btn-glow w-full cursor-pointer rounded-full py-6 font-semibold"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Logging in..." : "Log in"} <ArrowRight />

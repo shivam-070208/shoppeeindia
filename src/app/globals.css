@@ -37,8 +37,8 @@
   --foreground: oklch(0.15 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0 0);
-  --card-secondary: #0f172a;
-  --card-secondary-foreground: #ffffff;
+  --card-secondary: #e2e8f0;
+  --card-secondary-foreground: #1e293b;
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0 0);
   --primary: oklch(0.65 0.23 29);
@@ -86,6 +86,6 @@
     @apply bg-background text-foreground;
   }
   .btn-glow {
-    @apply shadow-[0px_4px_20px_0px_var(--color-primary)] transition-all hover:shadow-none;
+    @apply shadow-[0px_8px_40px_-4px_var(--color-primary)] transition-all hover:shadow-none;
   }
 }
