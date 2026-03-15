@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
   const session = await getServerSession();
 
-  if (!session) {
+  if (!session || !session.user.emailVerified) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "you are not authorized to access this resource",

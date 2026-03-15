@@ -15,6 +15,7 @@
     "*.{js,ts,tsx,jsx,css,md,json}": "prettier --write"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "6.19",
     "@tanstack/react-query": "^5.90.21",
     "@trpc/client": "^11.10.0",
@@ -30,8 +31,11 @@
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-hook-form": "^7.71.2",
+    "react-icons": "^5.5.0",
     "streamifier": "^0.1.1",
-    "tailwind-merge": "^3.5.0"
+    "tailwind-merge": "^3.5.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
