@@ -12,12 +12,18 @@ import {
 import { useForm } from "react-hook-form";
 import { ArrowRight, MailIcon, LockIcon } from "lucide-react";
 import { InputWithIcon } from "@/components/ui/input-with-icon";
+import { useRouter, useSearchParams } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+
 type LoginFormInputs = {
   email: string;
   password: string;
 };
 
 const LoginForm: React.FC = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const form = useForm<LoginFormInputs>({
     defaultValues: {
       email: "",
@@ -32,9 +38,25 @@ const LoginForm: React.FC = () => {
   } = form;
 
   const onSubmit = async (data: LoginFormInputs) => {
-    // TODO: Add authentication logic here
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    alert("Logged in!\n" + JSON.stringify(data, null, 2));
+    const redirect = searchParams.get("redirect") || "/";
+
+    const { error } = await authClient.signIn.email(
+      {
+        email: data.email,
+        password: data.password,
+        callbackURL: redirect,
+      },
+      {
+        onError: (ctx) => {
+          const message = ctx.error?.message || "Invalid email or password.";
+          form.setError("email", { type: "manual", message });
+        },
+      },
+    );
+
+    if (!error) {
+      router.push(redirect);
+    }
   };
 
   return (

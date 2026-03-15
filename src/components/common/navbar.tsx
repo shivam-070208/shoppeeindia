@@ -1,7 +1,7 @@
+import React from "react";
 import Logo from "./logo";
 import { Button } from "@/components/ui/button";
 import { UserIcon } from "lucide-react";
-import React from "react";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import Container from "./container";
 import Link from "next/link";
+import ProfileDropdown from "./profile-dropdown";
 
 const links = [
   { name: "Home", href: "/" },
@@ -17,8 +18,6 @@ const links = [
   { name: "Deals", href: "/deals" },
   { name: "Contact", href: "/contact" },
 ];
-
-const isLoggedIn = false;
 
 const Navbar = () => {
   return (
@@ -43,21 +42,7 @@ const Navbar = () => {
           </NavigationMenuList>
         </NavigationMenu>
         <div className="flex items-center gap-2">
-          {!isLoggedIn ? (
-            <>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button asChild size="sm" className="btn-glow rounded-full p-4">
-                <Link href="/signup">Sign Up</Link>
-              </Button>
-            </>
-          ) : (
-            <Button variant="ghost" size="icon">
-              <UserIcon className="h-5 w-5" />
-              <span className="sr-only">User menu</span>
-            </Button>
-          )}
+          <ProfileDropdown />
         </div>
       </Container>
     </nav>

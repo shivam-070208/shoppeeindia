@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/form";
 import { ArrowRight, MailIcon, LockIcon, UserIcon } from "lucide-react";
 import { InputWithIcon } from "@/components/ui/input-with-icon";
+import { useRouter, useSearchParams } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 type SignupFormInputs = {
   name: string;
@@ -20,6 +22,9 @@ type SignupFormInputs = {
 };
 
 const SignupForm: React.FC = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const form = useForm<SignupFormInputs>({
     defaultValues: {
       name: "",
@@ -35,9 +40,27 @@ const SignupForm: React.FC = () => {
   } = form;
 
   const onSubmit = async (data: SignupFormInputs) => {
-    // TODO: Add authentication logic here
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    alert("Signed up successfully!\n" + JSON.stringify(data, null, 2));
+    const redirect = searchParams.get("redirect") || "/";
+
+    const { error } = await authClient.signUp.email(
+      {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        callbackURL: redirect,
+      },
+      {
+        onError: (ctx) => {
+          const message =
+            ctx.error?.message || "Unable to sign up. Please try again.";
+          form.setError("email", { type: "manual", message });
+        },
+      },
+    );
+
+    if (!error) {
+      router.push(redirect);
+    }
   };
 
   return (

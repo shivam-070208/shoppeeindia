@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Container from "@/components/common/container";
 import {
@@ -12,6 +13,8 @@ import LogoIcon from "@/components/common/logo-icon";
 import { ORGANISATION_NAME } from "@/config/contants";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
+import { useSearchParams } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 type AuthLayoutProps = {
   children: React.ReactNode;
@@ -19,6 +22,17 @@ type AuthLayoutProps = {
 };
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children, authType }) => {
+  const searchParams = useSearchParams();
+
+  const handleGoogleAuth = async () => {
+    const redirect = searchParams.get("redirect") || "/";
+
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: redirect,
+    });
+  };
+
   return (
     <Container
       maxWidth="max-w-2xl"
@@ -54,6 +68,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, authType }) => {
             type="button"
             variant="outline"
             className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full py-6 font-medium"
+            onClick={handleGoogleAuth}
           >
             <FcGoogle />
             <span>Continue with Google</span>
