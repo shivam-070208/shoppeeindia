@@ -1,4 +1,5 @@
 import { getServerAdminFlags } from "@/lib/auth-utils";
+import AdminNavbar from "@/modules/admin/components/navbar";
 import AdminSidebar from "@/modules/admin/components/sidebar";
 import { forbidden } from "next/navigation";
 
@@ -13,7 +14,11 @@ export default async function Layout({
   }
   return (
     <AdminSidebar isSuperAdmin={isSuperAdmin}>
-      <main className="flex-1 p-4">{children}</main>
+      <div className="flex flex-1 flex-col gap-2">
+        <AdminNavbar />
+
+        <main className="flex-1 p-4">{children}</main>
+      </div>
     </AdminSidebar>
   );
 }

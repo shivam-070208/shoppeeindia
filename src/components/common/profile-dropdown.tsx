@@ -83,7 +83,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ isAdmin }) => {
   };
 
   const handleProfile = () => router.push("/profile");
-  const handleAdminDashboard = () => router.push("/admin");
+  const handleAdminDashboard = () => router.push("/admin/dashboard");
 
   const { user } = data;
 
