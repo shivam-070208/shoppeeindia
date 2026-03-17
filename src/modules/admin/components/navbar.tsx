@@ -24,7 +24,7 @@ const AdminNavbar = () => {
   );
 
   return (
-    <nav className="bg-background flex h-14 w-full items-center border-b px-4">
+    <nav className="bg-secondary flex h-14 w-full items-center border-b px-4">
       <Button
         variant="ghost"
         size="icon"

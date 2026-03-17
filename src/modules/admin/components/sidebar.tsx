@@ -46,7 +46,7 @@ const AdminSidebar = ({
       base[1],
       {
         label: "Admins",
-        href: "/admin/users",
+        href: "/super-admin/admins",
         icon: <Users className="h-5 w-5 text-orange-500" />,
       },
       base[2],

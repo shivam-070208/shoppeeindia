@@ -1,19 +1,19 @@
 import { createTRPCRouter } from "@/_trpc/init";
-import { adminProtectedProcedure } from "@/_trpc/procedure/admin-procedure";
-import { baseProcedure } from "@/_trpc/init";
+import { adminProcedure } from "@/_trpc/procedure/admin-procedure";
 import { slugify } from "@/utils/slugify";
+import { prisma } from "@/lib/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const categoryRouter = createTRPCRouter({
-  list: baseProcedure.query(async () => {
-    const categories = await prisma?.category.findMany({
+  list: adminProcedure.query(async () => {
+    const categories = await prisma.category.findMany({
       orderBy: { createdAt: "desc" },
     });
     return categories;
   }),
 
-  create: adminProtectedProcedure
+  create: adminProcedure
     .input(
       z.object({
         name: z.string().min(1),
@@ -21,7 +21,7 @@ export const categoryRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { name } = input;
-      const isCategory = await prisma?.category.findFirst({
+      const isCategory = await prisma.category.findFirst({
         where: { name },
       });
       if (isCategory) {
@@ -30,7 +30,7 @@ export const categoryRouter = createTRPCRouter({
           code: "CONFLICT",
         });
       }
-      const category = await prisma?.category.create({
+      const category = await prisma.category.create({
         data: {
           name,
           slug: slugify(name),
@@ -39,7 +39,7 @@ export const categoryRouter = createTRPCRouter({
       return category;
     }),
 
-  update: adminProtectedProcedure
+  update: adminProcedure
     .input(
       z.object({
         id: z.string().min(1),
@@ -48,7 +48,7 @@ export const categoryRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { id, name } = input;
-      const isCategory = await prisma?.category.findFirst({
+      const isCategory = await prisma.category.findFirst({
         where: {
           name,
           NOT: { id },
@@ -60,7 +60,7 @@ export const categoryRouter = createTRPCRouter({
           code: "CONFLICT",
         });
       }
-      const updatedCategory = await prisma?.category.update({
+      const updatedCategory = await prisma.category.update({
         where: { id },
         data: {
           name,
@@ -76,7 +76,7 @@ export const categoryRouter = createTRPCRouter({
       return updatedCategory;
     }),
 
-  delete: adminProtectedProcedure
+  delete: adminProcedure
     .input(
       z.object({
         id: z.string().min(1),
@@ -84,7 +84,7 @@ export const categoryRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { id } = input;
-      const deletedCategory = await prisma?.category.delete({
+      const deletedCategory = await prisma.category.delete({
         where: { id },
       });
       return deletedCategory;
