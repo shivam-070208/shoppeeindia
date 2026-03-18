@@ -6,20 +6,18 @@ import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubHeading } from "@/components/ui/sub-heading";
-import { trpc } from "@/_trpc/lib/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { useCreateCategory } from "@/modules/category/hooks/use-category";
 
 export default function Page() {
   const router = useRouter();
-  const utils = trpc.useUtils();
-  const createMutation = trpc.admin.category.create.useMutation({
-    onSuccess: async () => {
-      await utils.admin.category.list.invalidate();
-      router.push("/admin/categories");
-    },
-  });
+  const {
+    mutateAsync: createCategory,
+    isPending,
+    isError,
+  } = useCreateCategory();
 
   const [name, setName] = React.useState("");
 
@@ -27,7 +25,16 @@ export default function Page() {
     e.preventDefault();
     const trimmed = name.trim();
     if (trimmed.length < 1) return;
-    createMutation.mutate({ name: trimmed });
+    createCategory(
+      {
+        name: trimmed,
+      },
+      {
+        onSuccess: () => {
+          router.push("/admin/categories");
+        },
+      },
+    );
   }
 
   return (
@@ -73,16 +80,12 @@ export default function Page() {
                   Cancel
                 </Button>
               </Link>
-              <Button
-                type="submit"
-                variant="outline"
-                disabled={createMutation.isPending}
-              >
-                {createMutation.isPending ? "Creating..." : "Create"}
+              <Button type="submit" variant="outline" disabled={isPending}>
+                {isPending ? "Creating..." : "Create"}
               </Button>
             </div>
 
-            {createMutation.isError && (
+            {isError && (
               <div className="rounded border border-red-900/50 bg-red-950/20 p-3 text-sm text-red-200">
                 Failed to create category.
               </div>

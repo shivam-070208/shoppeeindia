@@ -6,12 +6,56 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const categoryRouter = createTRPCRouter({
-  list: adminProcedure.query(async () => {
-    const categories = await prisma.category.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-    return categories;
-  }),
+  list: adminProcedure
+    .input(
+      z
+        .object({
+          searchQuery: z.string().optional(),
+          page: z.number().int().min(1).optional(),
+          limit: z.number().int().min(1).max(100).optional(),
+        })
+        .optional(),
+    )
+    .query(async ({ input }) => {
+      const { searchQuery = "", page = 1, limit = 20 } = input ?? {};
+
+      const where =
+        searchQuery && searchQuery.trim() !== ""
+          ? {
+              OR: [
+                {
+                  name: {
+                    contains: searchQuery,
+                    mode: "insensitive" as const,
+                  },
+                },
+                {
+                  slug: {
+                    contains: searchQuery,
+                    mode: "insensitive" as const,
+                  },
+                },
+              ],
+            }
+          : {};
+
+      const [total, categories] = await Promise.all([
+        prisma.category.count({ where }),
+        prisma.category.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+      ]);
+      return {
+        items: categories,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      };
+    }),
 
   create: adminProcedure
     .input(

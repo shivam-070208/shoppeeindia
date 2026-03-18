@@ -8,18 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import React from "react";
-import { trpc } from "@/_trpc/lib/client";
 import { useRouter } from "next/navigation";
+import { useCreateStore } from "@/modules/store/hooks/use-store";
 
 export default function Page() {
   const router = useRouter();
-  const utils = trpc.useUtils();
-  const createMutation = trpc.admin.store.create.useMutation({
-    onSuccess: async () => {
-      await utils.admin.store.list.invalidate();
-      router.push("/admin/stores");
-    },
-  });
+  const createMutation = useCreateStore();
 
   const [name, setName] = React.useState("");
   const [file, setFile] = React.useState<File | null>(null);
@@ -45,10 +39,17 @@ export default function Page() {
       const data = (await res.json()) as { url?: string };
       if (!data.url) throw new Error("Upload failed");
 
-      createMutation.mutate({
-        name: trimmed,
-        logoUrl: data.url,
-      });
+      createMutation.mutate(
+        {
+          name: trimmed,
+          logoUrl: data.url,
+        },
+        {
+          onSuccess: async () => {
+            router.push("/admin/stores");
+          },
+        },
+      );
     } finally {
       setIsUploading(false);
     }

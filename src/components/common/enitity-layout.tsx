@@ -2,7 +2,6 @@
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
-import { motion } from "motion/react";
 import React, { createContext, useContext } from "react";
 import { Button } from "../ui/button";
 import {
@@ -12,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { SubHeading } from "../ui/sub-heading";
 import { Heading } from "../ui/heading";
@@ -99,16 +97,18 @@ const EntityHeader = ({
   >
     <div>{children}</div>
     {!!actionLabel && !action && actionHref && (
-      <Link href={actionHref} className="text-primary hover:opacity-80">
-        {actionLabel}
+      <Link
+        href={actionHref}
+        className="text-foreground btn-glow bg-primary flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold"
+      >
+        <PlusIcon className="inline" /> {actionLabel}
       </Link>
     )}
     {!!actionLabel && action && (
       <Button
         onClick={action}
-        variant={"outline"}
         disabled={isPending}
-        className="flex font-medium hover:opacity-80"
+        className="text-foreground btn-glow bg-primary flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold"
       >
         <PlusIcon className="inline" /> {actionLabel}
       </Button>
@@ -143,90 +143,58 @@ type EntityTableProps<T> = {
   columns: Column<T>[];
   className?: string;
 };
-/* eslint-disable */
 
-function EntityTable<T extends Record<string, any>>({
+function EntityTable<T>({
   data,
   columns,
   className = "",
 }: EntityTableProps<T>) {
-  const { sortKey } = useEntityContextValues();
-  const [sortedData, setSortedData] = React.useState(data);
-  React.useEffect(() => {
-    let filtered = [...data];
-    if (sortKey) {
-      const col = columns.find((c) => c.id === sortKey);
-      if (col) {
-        filtered = [...filtered].sort((a, b) => {
-          let aValue = col.accessor(a);
-          let bValue = col.accessor(b);
-          if (typeof aValue == "object") {
-            aValue = a[sortKey];
-          }
-          if (typeof bValue == "object") {
-            bValue = b[sortKey];
-          }
-          if (typeof aValue === "string" && typeof bValue === "string") {
-            return aValue.localeCompare(bValue);
-          }
-          if (typeof aValue === "number" && typeof bValue === "number") {
-            return aValue - bValue;
-          }
-          return 0;
-        });
-      }
-    }
-    setSortedData(filtered);
-  }, [sortKey, data, columns]);
-
   return (
     <div
-      className={cn(
-        "grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3",
-        className,
-      )}
+      className={`overflow-x-auto rounded-md border bg-neutral-900/70 p-0 ${className}`}
     >
-      {sortedData.length === 0 ? (
-        <div className="bg-muted text-muted-foreground col-span-full rounded border py-4 text-center">
-          No results found.
-        </div>
-      ) : (
-        sortedData.map((row, index) => (
-          <motion.div
-            animate={{ filter: "blur(0px)" }}
-            initial={{ filter: "blur(10px)" }}
-            transition={{ duration: 0.2 }}
-            layoutId={row.id ?? `entity-${index}`}
-            key={row.id ?? index}
-          >
-            <Card className="gap-0">
-              <CardHeader className="border-none">
-                <CardTitle className="text-sm">
-                  {columns.find(
-                    (col) => col.id === "name" || col.id === "title",
-                  )?.accessor
-                    ? columns
-                        .find((col) => col.id === "name" || col.id === "title")!
-                        .accessor(row)
-                    : row.name || row.title || "Untitled"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-muted-foreground space-y-1 text-xs">
-                {columns
-                  .filter((col) => col.id !== "name" && col.id !== "title")
-                  .map((col) => (
-                    <div key={col.id}>
-                      <span className="font-medium">{col.header}:</span>{" "}
-                      <span>
-                        {col.accessor ? col.accessor(row) : (row[col.id] ?? "")}
-                      </span>
-                    </div>
-                  ))}
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))
-      )}
+      <table className="min-w-full divide-y divide-neutral-800 text-sm">
+        <thead>
+          <tr>
+            {columns.map((col) => (
+              <th
+                key={col.id}
+                className={`px-8 py-4 text-left font-semibold tracking-wider text-neutral-400 uppercase ${col.className ?? ""}`}
+              >
+                {col.header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.length === 0 ? (
+            <tr>
+              <td
+                colSpan={columns.length}
+                className="px-4 py-6 text-center text-neutral-400"
+              >
+                No data found.
+              </td>
+            </tr>
+          ) : (
+            data.map((row, i) => (
+              <tr
+                key={i}
+                className={`bg-secondary border-b border-neutral-800`}
+              >
+                {columns.map((col) => (
+                  <td
+                    key={col.id}
+                    className={`px-8 py-4 align-middle ${col.className ?? ""}`}
+                  >
+                    {col.accessor(row)}
+                  </td>
+                ))}
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -295,33 +263,37 @@ function EntityTableFooter({
   className = "",
   pagination,
 }: EntityTableFooterProps) {
+  const { page, totalPages, total, limit, onPageChange } = pagination;
+
+  if (totalPages <= 1 && total <= limit) return null;
+
   return (
     <div
-      className={cn(
-        "mt-4 flex w-full items-center justify-between gap-4",
-        className,
-      )}
+      className={`footer flex w-full flex-col items-center justify-between gap-2 sm:flex-row ${className}`}
     >
-      <div className="text-muted-foreground text-sm">
-        Showing {(pagination.page - 1) * pagination.limit + 1} to +{" "}
-        {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
-        {pagination.total} results{" "}
-      </div>
+      <span className="text-muted-foreground text-xs select-none">
+        Showing {(page - 1) * limit + 1}-{Math.min(page * limit, total)} of{" "}
+        {total}
+      </span>
       <div className="flex items-center gap-2">
         <Button
+          size="sm"
           variant="outline"
-          size="icon-lg"
-          onClick={() => pagination.onPageChange(pagination.page - 1)}
-          disabled={pagination.page === 1}
+          onClick={() => onPageChange(page - 1)}
+          disabled={page <= 1}
         >
-          <ChevronLeftIcon className="h-16 w-16" />
+          <ChevronLeftIcon className="h-4 w-4" />
         </Button>
+        <span className="text-xs font-medium tabular-nums">
+          Page {page}/{totalPages}
+        </span>
         <Button
+          size="sm"
           variant="outline"
-          onClick={() => pagination.onPageChange(pagination.page + 1)}
-          disabled={pagination.page === pagination.totalPages}
+          onClick={() => onPageChange(page + 1)}
+          disabled={page >= totalPages}
         >
-          <ChevronRightIcon className="h-16 w-16" />
+          <ChevronRightIcon className="h-4 w-4" />
         </Button>
       </div>
     </div>

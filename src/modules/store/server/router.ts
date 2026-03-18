@@ -5,11 +5,45 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 
 export const storeRouter = createTRPCRouter({
-  list: adminProcedure.query(async () => {
-    return prisma.store.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-  }),
+  list: adminProcedure
+    .input(
+      z.object({
+        searchQuery: z.string().default(""),
+        page: z.number().int().default(0),
+        limit: z.number().int().default(10),
+      }),
+    )
+    .query(async ({ input }) => {
+      const { searchQuery, page, limit } = input;
+
+      const [stores, total] = await Promise.all([
+        prisma.store.findMany({
+          where: {
+            name: {
+              contains: searchQuery,
+            },
+          },
+          orderBy: { createdAt: "desc" },
+          skip: page * limit,
+          take: limit,
+        }),
+        prisma.store.count({
+          where: {
+            name: {
+              contains: searchQuery,
+            },
+          },
+        }),
+      ]);
+
+      return {
+        stores,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      };
+    }),
 
   create: adminProcedure
     .input(
@@ -58,3 +92,5 @@ export const storeRouter = createTRPCRouter({
       });
     }),
 });
+
+export type StoreRouter = typeof storeRouter;

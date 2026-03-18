@@ -1,5 +1,7 @@
-import CategoryManagementPage from "@/modules/category/components/admin/category-management-page";
+import CategoryManagementPage from "@/modules/admin/page/category-management";
 
-export default function Page() {
+const Page = () => {
   return <CategoryManagementPage />;
-}
+};
+
+export default Page;
