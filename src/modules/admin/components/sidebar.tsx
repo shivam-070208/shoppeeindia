@@ -5,6 +5,7 @@ import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { useMemo, useState } from "react";
 import { LayoutDashboard, Shapes, Store, Tag, Users } from "lucide-react";
 import ProfileDropdown from "@/components/common/profile-dropdown";
+import Link from "next/link";
 
 const AdminSidebar = ({
   isSuperAdmin = false,
@@ -60,7 +61,9 @@ const AdminSidebar = ({
         <SidebarBody className="bg-secondary justify-between border-r">
           <div className="flex flex-col gap-6">
             <div className="flex items-start gap-3 px-1">
-              <div className="shrink-0">{open ? <Logo /> : <LogoIcon />}</div>
+              <Link href={"/"} className="shrink-0">
+                {open ? <Logo /> : <LogoIcon />}
+              </Link>
             </div>
 
             <div className="flex flex-col gap-1">

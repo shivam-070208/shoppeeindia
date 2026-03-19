@@ -1,7 +1,7 @@
-import CategoryManagementPage from "@/modules/admin/page/category-management";
+import ManageCategory from "@/modules/admin/page/manage-category";
 
 const Page = () => {
-  return <CategoryManagementPage />;
+  return <ManageCategory />;
 };
 
 export default Page;

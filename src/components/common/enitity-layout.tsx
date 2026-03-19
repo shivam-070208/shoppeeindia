@@ -14,7 +14,7 @@ import {
 import { Input } from "../ui/input";
 import { SubHeading } from "../ui/sub-heading";
 import { Heading } from "../ui/heading";
-
+import { motion } from "motion/react";
 interface EntityContextType {
   sortKey: string;
   setSortKey: (key: string) => void;
@@ -71,6 +71,7 @@ type EntityHeaderProps =
       action: () => void;
       isPending?: boolean;
       actionHref?: never;
+      actionLayoutId?: string;
     }
   | {
       children: React.ReactNode;
@@ -78,7 +79,8 @@ type EntityHeaderProps =
       isPending?: never;
       actionLabel?: string;
       action?: never;
-      actionHref: string;
+      actionHref?: string;
+      actionLayoutId?: string;
     };
 
 const EntityHeader = ({
@@ -88,6 +90,7 @@ const EntityHeader = ({
   action,
   isPending,
   actionHref,
+  actionLayoutId,
 }: EntityHeaderProps) => (
   <div
     className={cn(
@@ -96,12 +99,14 @@ const EntityHeader = ({
     )}
   >
     <div>{children}</div>
+
     {!!actionLabel && !action && actionHref && (
       <Link
         href={actionHref}
         className="text-foreground btn-glow bg-primary flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold"
       >
-        <PlusIcon className="inline" /> {actionLabel}
+        <PlusIcon className="inline" />
+        <motion.span layoutId={actionLayoutId}>{actionLabel}</motion.span>
       </Link>
     )}
     {!!actionLabel && action && (
@@ -110,7 +115,8 @@ const EntityHeader = ({
         disabled={isPending}
         className="text-foreground btn-glow bg-primary flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold"
       >
-        <PlusIcon className="inline" /> {actionLabel}
+        <PlusIcon className="inline" />{" "}
+        <motion.span layoutId={actionLayoutId}>{actionLabel}</motion.span>
       </Button>
     )}
   </div>

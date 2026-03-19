@@ -1,5 +1,7 @@
-import StoreManagementPage from "@/modules/admin/page/store-management";
+import MangeStore from "@/modules/admin/page/manage-store";
 
-export default function Page() {
-  return <StoreManagementPage />;
-}
+const Page = () => {
+  return <MangeStore />;
+};
+
+export default Page;

@@ -7,11 +7,12 @@ import {
 } from "@/components/common/enitity-layout";
 import CategoriesGrid from "@/modules/category/components/admin/category-grid";
 
-const CategoryManagementPage: React.FC = () => (
+const ManageCategory: React.FC = () => (
   <EntityContentProvider>
     <EntityWrapper>
       <EntityHeader
-        actionLabel="Create Category"
+        actionLayoutId="admin-add-new-category-model"
+        actionLabel="Create"
         actionHref="/admin/categories/new"
       >
         <EntityHeaderContent
@@ -24,4 +25,4 @@ const CategoryManagementPage: React.FC = () => (
   </EntityContentProvider>
 );
 
-export default CategoryManagementPage;
+export default ManageCategory;
