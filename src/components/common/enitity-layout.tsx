@@ -15,6 +15,7 @@ import { Input } from "../ui/input";
 import { SubHeading } from "../ui/sub-heading";
 import { Heading } from "../ui/heading";
 import { motion } from "motion/react";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 interface EntityContextType {
   sortKey: string;
   setSortKey: (key: string) => void;

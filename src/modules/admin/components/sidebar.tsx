@@ -58,7 +58,7 @@ const AdminSidebar = ({
   return (
     <div className="flex h-dvh w-dvw flex-col overflow-hidden overflow-y-auto md:flex-row">
       <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="bg-secondary justify-between border-r">
+        <SidebarBody className="bg-secondary sticky top-0 justify-between border-r">
           <div className="flex flex-col gap-6">
             <div className="flex items-start gap-3 px-1">
               <Link href={"/"} className="shrink-0">

@@ -21,6 +21,7 @@ export const storeRouter = createTRPCRouter({
           where: {
             name: {
               contains: searchQuery,
+              mode: "insensitive",
             },
           },
           orderBy: { createdAt: "desc" },

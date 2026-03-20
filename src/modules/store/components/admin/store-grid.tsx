@@ -6,15 +6,10 @@ import {
   EntityTable,
 } from "@/components/common/enitity-layout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { cn, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import Image from "next/image";
 import { useState } from "react";
-import {
-  useStores,
-  useUpdateStore,
-  useDeleteStore,
-} from "../../hooks/use-store";
+import { useStores, useDeleteStore } from "../../hooks/use-store";
 import Link from "next/link";
 import { Trash2, ArrowUpRight } from "lucide-react";
 
@@ -31,17 +26,12 @@ const StoresGrid = () => {
   const [page, setPage] = useState(0);
   const [limit] = useState(10);
 
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [draftName, setDraftName] = useState("");
-  const [draftLogoUrl, setDraftLogoUrl] = useState("");
-
   const { data, isPending, isError } = useStores({
     searchQuery: search,
     page,
     limit,
   });
 
-  const updateMutation = useUpdateStore();
   const deleteMutation = useDeleteStore();
 
   const paged = data?.stores ?? [];
@@ -105,20 +95,7 @@ const StoresGrid = () => {
               className="inline-flex cursor-pointer items-center justify-center rounded-sm p-1"
               title="Delete Store"
               disabled={deleteMutation.isPending}
-              onClick={() =>
-                deleteMutation.mutate(
-                  { id: row.id },
-                  {
-                    onSuccess: () => {
-                      if (editingId === row.id) {
-                        setEditingId(null);
-                        setDraftName("");
-                        setDraftLogoUrl("");
-                      }
-                    },
-                  },
-                )
-              }
+              onClick={() => deleteMutation.mutate({ id: row.id })}
             >
               <Trash2 className="h-5 w-5 text-red-500" />
             </Button>

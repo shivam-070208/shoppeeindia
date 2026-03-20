@@ -12,19 +12,71 @@ function computeDiscountPercent(originalPrice: number, dealPrice: number) {
 }
 
 export const dealRouter = createTRPCRouter({
-  list: adminProcedure.query(async () => {
-    return prisma.deal.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        store: { select: { id: true, name: true, slug: true, logoUrl: true } },
-        category: { select: { id: true, name: true, slug: true } },
-      },
-    });
-  }),
+  list: adminProcedure
+    .input(
+      z.object({
+        searchQuery: z.string().default(""),
+        page: z.number().int().min(1).default(1),
+        limit: z.number().int().min(1).max(100).default(10),
+      }),
+    )
+    .query(async ({ input }) => {
+      const { searchQuery, page, limit } = input;
+
+      const where =
+        searchQuery.trim() !== ""
+          ? {
+              OR: [
+                {
+                  store: {
+                    name: {
+                      contains: searchQuery,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+                {
+                  category: {
+                    name: {
+                      contains: searchQuery,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+              ],
+            }
+          : {};
+
+      const [total, items] = await Promise.all([
+        prisma.deal.count({ where }),
+        prisma.deal.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          include: {
+            store: {
+              select: { id: true, name: true, slug: true, logoUrl: true },
+            },
+            category: { select: { id: true, name: true, slug: true } },
+          },
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+      ]);
+
+      return {
+        items,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      };
+    }),
 
   create: adminProcedure
     .input(
       z.object({
+        name: z.string().min(1),
+        description: z.string().min(1),
         imageUrl: z.string().url(),
         originalPrice: z.number().int().positive(),
         dealPrice: z.number().int().positive(),
@@ -68,6 +120,8 @@ export const dealRouter = createTRPCRouter({
 
       return prisma.deal.create({
         data: {
+          name: input.name,
+          description: input.description,
           slug,
           imageUrl: input.imageUrl,
           originalPrice: input.originalPrice,
