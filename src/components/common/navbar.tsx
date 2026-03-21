@@ -1,7 +1,5 @@
 import React from "react";
 import Logo from "./logo";
-import { Button } from "@/components/ui/button";
-import { UserIcon } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -9,8 +7,8 @@ import {
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
 import Container from "./container";
-import Link from "next/link";
 import ProfileDropdown from "./profile-dropdown";
+import { getServerAdminFlags } from "@/lib/auth-utils";
 
 const links = [
   { name: "Home", href: "/" },
@@ -19,7 +17,9 @@ const links = [
   { name: "Contact", href: "/contact" },
 ];
 
-const Navbar = () => {
+const Navbar = async () => {
+  const { isAdmin } = await getServerAdminFlags();
+
   return (
     <nav className="w-full border-b-2 py-3">
       <Container maxWidth="max-w-7xl flex justify-between">
@@ -42,7 +42,7 @@ const Navbar = () => {
           </NavigationMenuList>
         </NavigationMenu>
         <div className="flex items-center gap-2">
-          <ProfileDropdown />
+          <ProfileDropdown isAdmin={isAdmin} />
         </div>
       </Container>
     </nav>

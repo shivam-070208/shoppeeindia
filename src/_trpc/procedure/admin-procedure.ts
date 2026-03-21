@@ -3,10 +3,10 @@ import { protectedProcedure } from "./protected-procedure";
 import { prisma } from "@/lib/db";
 export const adminProtectedProcedure = protectedProcedure.use(
   async ({ ctx, next }) => {
-    const session = ctx.session.session;
+    const session = ctx.session;
     const admin = await prisma.admin.findUnique({
       where: {
-        userId: session.userId,
+        userId: session.user.id,
       },
     });
     if (!admin) {
@@ -19,3 +19,6 @@ export const adminProtectedProcedure = protectedProcedure.use(
     return next({ ctx: { ...ctx, admin } });
   },
 );
+
+// Alias to match naming used across routers/components.
+export const adminProcedure = adminProtectedProcedure;

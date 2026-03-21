@@ -20,7 +20,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} font-inter antialiased`}>
+      <body className={`${inter.variable} font-inter h-full antialiased`}>
         <TRPCProvider>{children}</TRPCProvider>
       </body>
     </html>

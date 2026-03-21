@@ -28,8 +28,9 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
-
   --font-inter: var(--font-inter);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
 }
 
 :root {
@@ -53,6 +54,8 @@
   --input: oklch(0.92 0 0);
   --ring: oklch(0.65 0.23 29);
   --destructive: oklch(0.62 0.25 25);
+  --sidebar: #f6f8fa;
+  --sidebar-foreground: #1a1a1a;
 }
 
 .dark {
@@ -76,6 +79,8 @@
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.65 0.23 29);
   --destructive: oklch(0.62 0.25 25);
+  --sidebar: #1a1a1a;
+  --sidebar-foreground: #fafafa;
 }
 
 @layer base {
@@ -83,7 +88,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground min-h-dvh w-dvw overflow-x-hidden;
   }
   .btn-glow {
     @apply shadow-[0px_8px_40px_-4px_var(--color-primary)] transition-all hover:shadow-none;

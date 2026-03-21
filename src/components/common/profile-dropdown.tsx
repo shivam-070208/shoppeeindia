@@ -53,7 +53,11 @@ const UserAvatar = ({ user }: { user: User }) =>
     <InitialAvatar name={user.name} size={36} />
   );
 
-const ProfileDropdown = () => {
+type ProfileDropdownProps = {
+  isAdmin?: boolean;
+};
+
+const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ isAdmin }) => {
   const router = useRouter();
   const { data, isPending: isLoading } = authClient.useSession();
 
@@ -79,6 +83,7 @@ const ProfileDropdown = () => {
   };
 
   const handleProfile = () => router.push("/profile");
+  const handleAdminDashboard = () => router.push("/admin/dashboard");
 
   const { user } = data;
 
@@ -100,6 +105,14 @@ const ProfileDropdown = () => {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={handleProfile}>Profile</DropdownMenuItem>
+        {isAdmin ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={handleAdminDashboard}>
+              Admin dashboard
+            </DropdownMenuItem>
+          </>
+        ) : null}
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={handleLogout} className="text-red-600">
           Logout
