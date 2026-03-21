@@ -1,4 +1,5 @@
 import { CloudinaryFolder } from "@/data/cloudinary-folder";
+import { getServerAdminFlags } from "@/lib/auth-utils";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { NextResponse } from "next/server";
 
@@ -6,6 +7,10 @@ export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
+    const { isAdmin } = await getServerAdminFlags();
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     const formData = await req.formData();
     const file = formData.get("file");
 
