@@ -1,5 +1,6 @@
 import { createTRPCRouter } from "@/_trpc/init";
 import { adminProcedure } from "@/_trpc/procedure/admin-procedure";
+import { QueryMode } from "@/generated/prisma/internal/prismaNamespace";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/utils/slugify";
 import { TRPCError } from "@trpc/server";
@@ -23,29 +24,37 @@ export const dealRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { searchQuery, page, limit } = input;
 
-      const where =
-        searchQuery.trim() !== ""
-          ? {
-              OR: [
-                {
-                  store: {
-                    name: {
-                      contains: searchQuery,
-                      mode: "insensitive",
-                    },
-                  },
+      const trimmedQuery = searchQuery.trim();
+      const where = {
+        OR: [
+          {
+            name: {
+              contains: trimmedQuery,
+              mode: QueryMode.insensitive,
+            },
+          },
+          {
+            store: {
+              is: {
+                name: {
+                  contains: trimmedQuery,
+                  mode: QueryMode.insensitive,
                 },
-                {
-                  category: {
-                    name: {
-                      contains: searchQuery,
-                      mode: "insensitive",
-                    },
-                  },
+              },
+            },
+          },
+          {
+            category: {
+              is: {
+                name: {
+                  contains: trimmedQuery,
+                  mode: QueryMode.insensitive,
                 },
-              ],
-            }
-          : {};
+              },
+            },
+          },
+        ],
+      };
 
       const [total, items] = await Promise.all([
         prisma.deal.count({ where }),
