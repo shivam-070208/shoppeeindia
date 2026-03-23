@@ -4,7 +4,7 @@ import {
   EntityHeader,
   EntityHeaderContent,
   EntityWrapper,
-} from "@/components/common/enitity-layout";
+} from "@/components/common/entity-layout";
 import AdminsGrid from "../components/admins-grid";
 
 const ManageAdmins: React.FC = () => (

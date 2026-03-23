@@ -2,7 +2,7 @@ import {
   EntityHeader,
   EntityHeaderContent,
   EntityWrapper,
-} from "@/components/common/enitity-layout";
+} from "@/components/common/entity-layout";
 import AddCategoryForm from "@/modules/category/components/admin/add-category-form";
 
 const AddNewCategory = () => {

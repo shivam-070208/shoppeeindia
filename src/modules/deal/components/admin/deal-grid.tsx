@@ -4,7 +4,7 @@ import {
   EntityTableFooter,
   EntityTableHeader,
   useEntityContextValues,
-} from "@/components/common/enitity-layout";
+} from "@/components/common/entity-layout";
 import { Button } from "@/components/ui/button";
 import {
   Card,

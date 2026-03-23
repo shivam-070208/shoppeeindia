@@ -19,22 +19,27 @@ const AddAdminForm: React.FC = () => {
   } = useCreateAdmin();
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
+  const [clientError, setClientError] = React.useState<string | null>(null);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setClientError(null);
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
     if (!trimmedName || !trimmedEmail) return;
-    await createAdmin(
-      { name: trimmedName, email: trimmedEmail },
-      {
-        onSuccess: () => {
-          router.push("/super-admin/admins");
+    try {
+      await createAdmin(
+        { name: trimmedName, email: trimmedEmail },
+        {
+          onSuccess: () => {
+            router.push("/super-admin/admins");
+          },
         },
-      },
-    );
+      );
+    } catch {
+      setClientError("An unexpected error occurred. Please try again.");
+    }
   };
-
   return (
     <Card className="bg-neutral-950/30">
       <CardHeader>
@@ -85,9 +90,9 @@ const AddAdminForm: React.FC = () => {
             </motion.div>
           </div>
 
-          {isError && (
+          {(isError || clientError) && (
             <div className="rounded border border-red-900/50 bg-red-950/20 p-3 text-sm text-red-200">
-              {error.message}
+              {clientError ? clientError : error?.message}
             </div>
           )}
         </form>
