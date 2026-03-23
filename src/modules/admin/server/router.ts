@@ -137,7 +137,7 @@ export const adminRouters = createTRPCRouter({
       z.object({
         id: z.string(),
         name: z.string().optional(),
-        email: z.string().optional(),
+        email: z.string().email().optional(),
       }),
     )
     .mutation(async ({ input }) => {
