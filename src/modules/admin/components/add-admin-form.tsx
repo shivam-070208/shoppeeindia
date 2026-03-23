@@ -68,7 +68,7 @@ const AddAdminForm: React.FC = () => {
           </div>
 
           <div className="flex items-center justify-end gap-2">
-            <Link href="/admin/admins">
+            <Link href="/super-admin/admins">
               <Button type="button" variant="ghost" className="cursor-pointer">
                 Cancel
               </Button>
