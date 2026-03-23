@@ -15,7 +15,7 @@ type DealListInput = {
 
 export const useListDeals = (params?: DealListInput) => {
   const trpc = useTRPC();
-  return useSuspenseQuery(trpc.admin.deal.list.queryOptions(params ?? {}));
+  return useSuspenseQuery(trpc.deal.list.queryOptions(params ?? {}));
 };
 
 export const useCreateDeal = () => {
@@ -23,10 +23,10 @@ export const useCreateDeal = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    trpc.admin.deal.create.mutationOptions({
+    trpc.deal.create.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: trpc.admin.deal.list.queryKey(),
+          queryKey: trpc.deal.list.queryKey(),
         });
       },
     }),
@@ -38,10 +38,10 @@ export const useDeleteDeal = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    trpc.admin.deal.delete.mutationOptions({
+    trpc.deal.delete.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: trpc.admin.deal.list.queryKey(),
+          queryKey: trpc.deal.list.queryKey(),
         });
       },
     }),
