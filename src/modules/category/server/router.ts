@@ -17,44 +17,52 @@ export const categoryRouter = createTRPCRouter({
         .optional(),
     )
     .query(async ({ input }) => {
-      const { searchQuery = "", page = 1, limit = 20 } = input ?? {};
+      try {
+        const { searchQuery = "", page = 1, limit = 20 } = input ?? {};
 
-      const where =
-        searchQuery && searchQuery.trim() !== ""
-          ? {
-              OR: [
-                {
-                  name: {
-                    contains: searchQuery,
-                    mode: "insensitive" as const,
+        const where =
+          searchQuery && searchQuery.trim() !== ""
+            ? {
+                OR: [
+                  {
+                    name: {
+                      contains: searchQuery,
+                      mode: "insensitive" as const,
+                    },
                   },
-                },
-                {
-                  slug: {
-                    contains: searchQuery,
-                    mode: "insensitive" as const,
+                  {
+                    slug: {
+                      contains: searchQuery,
+                      mode: "insensitive" as const,
+                    },
                   },
-                },
-              ],
-            }
-          : {};
+                ],
+              }
+            : {};
 
-      const [total, categories] = await Promise.all([
-        prisma.category.count({ where }),
-        prisma.category.findMany({
-          where,
-          orderBy: { createdAt: "desc" },
-          skip: (page - 1) * limit,
-          take: limit,
-        }),
-      ]);
-      return {
-        items: categories,
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      };
+        const [total, categories] = await Promise.all([
+          prisma.category.count({ where }),
+          prisma.category.findMany({
+            where,
+            orderBy: { createdAt: "desc" },
+            skip: (page - 1) * limit,
+            take: limit,
+          }),
+        ]);
+        return {
+          items: categories,
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        };
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to list categories",
+          cause: err instanceof Error ? err.message : undefined,
+        });
+      }
     }),
 
   create: adminProcedure
@@ -64,23 +72,34 @@ export const categoryRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      const { name } = input;
-      const isCategory = await prisma.category.findFirst({
-        where: { name },
-      });
-      if (isCategory) {
+      try {
+        const { name } = input;
+        const isCategory = await prisma.category.findFirst({
+          where: { name },
+        });
+        if (isCategory) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "category with same name already exists",
+          });
+        }
+        const category = await prisma.category.create({
+          data: {
+            name,
+            slug: slugify(name),
+          },
+        });
+        return category;
+      } catch (err) {
+        if (err instanceof TRPCError) {
+          throw err;
+        }
         throw new TRPCError({
-          message: "category with same name already exists",
-          code: "CONFLICT",
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create category",
+          cause: err instanceof Error ? err.message : undefined,
         });
       }
-      const category = await prisma.category.create({
-        data: {
-          name,
-          slug: slugify(name),
-        },
-      });
-      return category;
     }),
 
   update: adminProcedure
@@ -91,33 +110,44 @@ export const categoryRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      const { id, name } = input;
-      const isCategory = await prisma.category.findFirst({
-        where: {
-          name,
-          NOT: { id },
-        },
-      });
-      if (isCategory) {
+      try {
+        const { id, name } = input;
+        const isCategory = await prisma.category.findFirst({
+          where: {
+            name,
+            NOT: { id },
+          },
+        });
+        if (isCategory) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "category with same name already exists",
+          });
+        }
+        const updatedCategory = await prisma.category.update({
+          where: { id },
+          data: {
+            name,
+            slug: slugify(name),
+          },
+        });
+        if (!updatedCategory) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Category not found",
+          });
+        }
+        return updatedCategory;
+      } catch (err) {
+        if (err instanceof TRPCError) {
+          throw err;
+        }
         throw new TRPCError({
-          message: "category with same name already exists",
-          code: "CONFLICT",
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update category",
+          cause: err instanceof Error ? err.message : undefined,
         });
       }
-      const updatedCategory = await prisma.category.update({
-        where: { id },
-        data: {
-          name,
-          slug: slugify(name),
-        },
-      });
-      if (!updatedCategory) {
-        throw new TRPCError({
-          message: "Category not found",
-          code: "NOT_FOUND",
-        });
-      }
-      return updatedCategory;
     }),
 
   delete: adminProcedure
@@ -127,10 +157,31 @@ export const categoryRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      const { id } = input;
-      const deletedCategory = await prisma.category.delete({
-        where: { id },
-      });
-      return deletedCategory;
+      try {
+        const { id } = input;
+        // Check existence first for proper 404
+        const existing = await prisma.category.findUnique({
+          where: { id },
+        });
+        if (!existing) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Category not found",
+          });
+        }
+        const deletedCategory = await prisma.category.delete({
+          where: { id },
+        });
+        return deletedCategory;
+      } catch (err) {
+        if (err instanceof TRPCError) {
+          throw err;
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete category",
+          cause: err instanceof Error ? err.message : undefined,
+        });
+      }
     }),
 });
