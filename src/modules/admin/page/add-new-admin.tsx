@@ -11,8 +11,8 @@ const AddNewAdmin = () => {
     <EntityWrapper>
       <EntityHeader>
         <EntityHeaderContent
-          heading="Deals"
-          subheading="Add a new deal by uploading an image, assigning store + category, and setting prices."
+          heading="Add New Admin"
+          subheading="Create a new admin by providing their user information and role."
         />
       </EntityHeader>
       <AddAdminForm />
