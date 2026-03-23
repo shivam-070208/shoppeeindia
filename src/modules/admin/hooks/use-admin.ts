@@ -1,57 +1,59 @@
+"use client";
+
 import { useTRPC } from "@/_trpc/lib/client";
 import {
-  useMutation,
   useSuspenseQuery,
+  useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
 
-type StoreListInput = {
+type AdminListInput = {
   searchQuery?: string;
   page?: number;
   limit?: number;
 };
 
-export const useStores = (params?: StoreListInput) => {
+export const useListAdmins = (params?: AdminListInput) => {
   const trpc = useTRPC();
-  return useSuspenseQuery(trpc.store.list.queryOptions(params ?? {}));
+  return useSuspenseQuery(trpc.admin.list.queryOptions(params ?? {}));
 };
 
-export const useUpdateStore = () => {
+export const useCreateAdmin = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   return useMutation(
-    trpc.store.update.mutationOptions({
+    trpc.admin.create.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: trpc.store.list.queryKey(),
+          queryKey: trpc.admin.list.queryKey(),
         });
       },
     }),
   );
 };
 
-export const useDeleteStore = () => {
+export const useUpdateAdmin = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   return useMutation(
-    trpc.store.delete.mutationOptions({
+    trpc.admin.update.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: trpc.store.list.queryKey(),
+          queryKey: trpc.admin.list.queryKey(),
         });
       },
     }),
   );
 };
 
-export const useCreateStore = () => {
+export const useDeleteAdmin = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   return useMutation(
-    trpc.store.create.mutationOptions({
+    trpc.admin.delete.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: trpc.store.list.queryKey(),
+          queryKey: trpc.admin.list.queryKey(),
         });
       },
     }),

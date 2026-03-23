@@ -15,7 +15,7 @@ type CategoryListInput = {
 
 export const useListCategories = (params?: CategoryListInput) => {
   const trpc = useTRPC();
-  return useSuspenseQuery(trpc.admin.category.list.queryOptions(params ?? {}));
+  return useSuspenseQuery(trpc.category.list.queryOptions(params ?? {}));
 };
 
 export const useCreateCategory = () => {
@@ -23,10 +23,10 @@ export const useCreateCategory = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    trpc.admin.category.create.mutationOptions({
+    trpc.category.create.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: trpc.admin.category.list.queryKey(),
+          queryKey: trpc.category.list.queryKey(),
         });
       },
     }),
@@ -37,10 +37,10 @@ export const useUpdateCategory = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   return useMutation(
-    trpc.admin.category.update.mutationOptions({
+    trpc.category.update.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: trpc.admin.category.list.queryKey(),
+          queryKey: trpc.category.list.queryKey(),
         });
       },
     }),
@@ -51,10 +51,10 @@ export const useDeleteCategory = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   return useMutation(
-    trpc.admin.category.delete.mutationOptions({
+    trpc.category.delete.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: trpc.admin.category.list.queryKey(),
+          queryKey: trpc.category.list.queryKey(),
         });
       },
     }),

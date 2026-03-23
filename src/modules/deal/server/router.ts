@@ -22,63 +22,70 @@ export const dealRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      const { searchQuery, page, limit } = input;
-
-      const trimmedQuery = searchQuery.trim();
-      const where = {
-        OR: [
-          {
-            name: {
-              contains: trimmedQuery,
-              mode: QueryMode.insensitive,
+      try {
+        const { searchQuery, page, limit } = input;
+        const trimmedQuery = searchQuery.trim();
+        const where = {
+          OR: [
+            {
+              name: {
+                contains: trimmedQuery,
+                mode: QueryMode.insensitive,
+              },
             },
-          },
-          {
-            store: {
-              is: {
-                name: {
-                  contains: trimmedQuery,
-                  mode: QueryMode.insensitive,
+            {
+              store: {
+                is: {
+                  name: {
+                    contains: trimmedQuery,
+                    mode: QueryMode.insensitive,
+                  },
                 },
               },
             },
-          },
-          {
-            category: {
-              is: {
-                name: {
-                  contains: trimmedQuery,
-                  mode: QueryMode.insensitive,
+            {
+              category: {
+                is: {
+                  name: {
+                    contains: trimmedQuery,
+                    mode: QueryMode.insensitive,
+                  },
                 },
               },
             },
-          },
-        ],
-      };
+          ],
+        };
 
-      const [total, items] = await Promise.all([
-        prisma.deal.count({ where }),
-        prisma.deal.findMany({
-          where,
-          orderBy: { createdAt: "desc" },
-          include: {
-            store: {
-              select: { id: true, name: true, slug: true, logoUrl: true },
+        const [total, items] = await Promise.all([
+          prisma.deal.count({ where }),
+          prisma.deal.findMany({
+            where,
+            orderBy: { createdAt: "desc" },
+            include: {
+              store: {
+                select: { id: true, name: true, slug: true, logoUrl: true },
+              },
+              category: { select: { id: true, name: true, slug: true } },
             },
-            category: { select: { id: true, name: true, slug: true } },
-          },
-          skip: (page - 1) * limit,
-          take: limit,
-        }),
-      ]);
+            skip: (page - 1) * limit,
+            take: limit,
+          }),
+        ]);
 
-      return {
-        items,
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      };
+        return {
+          items,
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        };
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to list deals",
+          cause: err instanceof Error ? err.message : undefined,
+        });
+      }
     }),
 
   create: adminProcedure
@@ -96,53 +103,66 @@ export const dealRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      if (input.dealPrice > input.originalPrice) {
+      try {
+        if (input.dealPrice > input.originalPrice) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Deal price cannot be greater than original price",
+          });
+        }
+
+        const [store, category] = await Promise.all([
+          prisma.store.findUnique({
+            where: { id: input.storeId },
+            select: { name: true },
+          }),
+          prisma.category.findUnique({
+            where: { id: input.categoryId },
+            select: { name: true },
+          }),
+        ]);
+
+        if (!store || !category) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid store or category",
+          });
+        }
+
+        const slug = slugify(
+          `${store.name}-${category.name}-${input.name}-${Date.now()}`,
+        );
+        const discountPercent = computeDiscountPercent(
+          input.originalPrice,
+          input.dealPrice,
+        );
+
+        return await prisma.deal.create({
+          data: {
+            name: input.name,
+            description: input.description,
+            slug,
+            imageUrl: input.imageUrl,
+            originalPrice: input.originalPrice,
+            dealPrice: input.dealPrice,
+            discountPercent,
+            affiliateUrl: input.affiliateUrl,
+            storeId: input.storeId,
+            categoryId: input.categoryId,
+            createdBy: ctx.admin.id,
+            expiryDate: input.expiryDate,
+          },
+        });
+      } catch (err) {
+        if (err instanceof TRPCError) {
+          throw err;
+        }
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Deal price cannot be greater than original price",
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create deal",
+          cause: err instanceof Error ? err.message : undefined,
         });
       }
-
-      const [store, category] = await Promise.all([
-        prisma.store.findUnique({
-          where: { id: input.storeId },
-          select: { name: true },
-        }),
-        prisma.category.findUnique({
-          where: { id: input.categoryId },
-          select: { name: true },
-        }),
-      ]);
-
-      if (!store || !category) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Invalid store or category",
-        });
-      }
-
-      const slug = slugify(`${store.name}-${category.name}-${Date.now()}`);
-      const discountPercent = computeDiscountPercent(
-        input.originalPrice,
-        input.dealPrice,
-      );
-
-      return prisma.deal.create({
-        data: {
-          name: input.name,
-          description: input.description,
-          slug,
-          imageUrl: input.imageUrl,
-          originalPrice: input.originalPrice,
-          dealPrice: input.dealPrice,
-          discountPercent,
-          affiliateUrl: input.affiliateUrl,
-          storeId: input.storeId,
-          categoryId: input.categoryId,
-          createdBy: ctx.admin.id,
-          expiryDate: input.expiryDate,
-        },
-      });
     }),
 
   update: adminProcedure
@@ -156,33 +176,65 @@ export const dealRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      if (input.dealPrice > input.originalPrice) {
+      try {
+        if (input.dealPrice > input.originalPrice) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Deal price cannot be greater than original price",
+          });
+        }
+
+        const discountPercent = computeDiscountPercent(
+          input.originalPrice,
+          input.dealPrice,
+        );
+
+        const updatedDeal = await prisma.deal.update({
+          where: { id: input.id },
+          data: {
+            originalPrice: input.originalPrice,
+            dealPrice: input.dealPrice,
+            discountPercent,
+            affiliateUrl: input.affiliateUrl,
+            expiryDate: input.expiryDate,
+          },
+        });
+        return updatedDeal;
+      } catch (err) {
+        if (err instanceof TRPCError) {
+          throw err;
+        }
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Deal price cannot be greater than original price",
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update deal",
+          cause: err instanceof Error ? err.message : undefined,
         });
       }
-
-      const discountPercent = computeDiscountPercent(
-        input.originalPrice,
-        input.dealPrice,
-      );
-
-      return prisma.deal.update({
-        where: { id: input.id },
-        data: {
-          originalPrice: input.originalPrice,
-          dealPrice: input.dealPrice,
-          discountPercent,
-          affiliateUrl: input.affiliateUrl,
-          expiryDate: input.expiryDate,
-        },
-      });
     }),
 
   delete: adminProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ input }) => {
-      return prisma.deal.delete({ where: { id: input.id } });
+      try {
+        const existing = await prisma.deal.findUnique({
+          where: { id: input.id },
+        });
+        if (!existing) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Deal not found",
+          });
+        }
+        return await prisma.deal.delete({ where: { id: input.id } });
+      } catch (err) {
+        if (err instanceof TRPCError) {
+          throw err;
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete deal",
+          cause: err instanceof Error ? err.message : undefined,
+        });
+      }
     }),
 });
