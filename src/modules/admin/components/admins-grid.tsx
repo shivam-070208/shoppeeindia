@@ -89,7 +89,7 @@ const AdminsGrid: React.FC = () => {
                     <CardContent className="mt-1 flex flex-1 flex-col gap-2">
                       <div className="flex-1" />
                       <div className="flex gap-2">
-                        <Link href={`/admin/admins/${admin.id}`}>
+                        <Link href={`/super-admin/admins/${admin.id}`}>
                           <Button
                             variant="secondary"
                             className="flex-1 justify-center rounded-full py-2 text-base font-semibold"
