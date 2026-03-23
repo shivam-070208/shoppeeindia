@@ -152,8 +152,9 @@ export const adminRouters = createTRPCRouter({
             message: "Admin not found",
           });
         }
+      return await prisma.$transaction(async (tx) => {
         if (email !== undefined) {
-          const existingUser = await prisma.user.findFirst({
+          const existingUser = await tx.user.findFirst({
             where: {
               email,
               id: { not: admin.userId },
@@ -167,7 +168,7 @@ export const adminRouters = createTRPCRouter({
           }
         }
         if (name !== undefined || email !== undefined) {
-          await prisma.user.update({
+          await tx.user.update({
             where: { id: admin.userId },
             data: {
               ...(name !== undefined ? { name } : {}),
@@ -175,10 +176,11 @@ export const adminRouters = createTRPCRouter({
             },
           });
         }
-        const updatedAdmin = await prisma.admin.update({
+        return tx.admin.findUnique({
           where: { id },
-          data: {},
+          include: { user: { select: { name: true, email: true, image: true } } },
         });
+      });
         return updatedAdmin;
       } catch (err) {
         if (err instanceof TRPCError) {
