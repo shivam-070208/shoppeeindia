@@ -73,7 +73,7 @@ const AddAdminForm: React.FC = () => {
                 Cancel
               </Button>
             </Link>
-            <motion.div layoutId="admin-add-new-admin-model">
+            <motion.div layoutId="admin-add-new-admin-modal">
               <Button
                 type="submit"
                 variant="outline"
