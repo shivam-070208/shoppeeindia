@@ -112,6 +112,15 @@ export const categoryRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       try {
         const { id, name } = input;
+        const existingCategory = await prisma.category.findUnique({
+          where: { id },
+        });
+        if (!existingCategory) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Category not found",
+          });
+        }
         const isCategory = await prisma.category.findFirst({
           where: {
             name,
@@ -131,12 +140,6 @@ export const categoryRouter = createTRPCRouter({
             slug: slugify(name),
           },
         });
-        if (!updatedCategory) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Category not found",
-          });
-        }
         return updatedCategory;
       } catch (err) {
         if (err instanceof TRPCError) {

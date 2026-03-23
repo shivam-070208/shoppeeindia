@@ -152,36 +152,37 @@ export const adminRouters = createTRPCRouter({
             message: "Admin not found",
           });
         }
-      return await prisma.$transaction(async (tx) => {
-        if (email !== undefined) {
-          const existingUser = await tx.user.findFirst({
-            where: {
-              email,
-              id: { not: admin.userId },
-            },
-          });
-          if (existingUser) {
-            throw new TRPCError({
-              code: "CONFLICT",
-              message: "User with this email already exists",
+        return await prisma.$transaction(async (tx) => {
+          if (email !== undefined) {
+            const existingUser = await tx.user.findFirst({
+              where: {
+                email,
+                id: { not: admin.userId },
+              },
+            });
+            if (existingUser) {
+              throw new TRPCError({
+                code: "CONFLICT",
+                message: "User with this email already exists",
+              });
+            }
+          }
+          if (name !== undefined || email !== undefined) {
+            await tx.user.update({
+              where: { id: admin.userId },
+              data: {
+                ...(name !== undefined ? { name } : {}),
+                ...(email !== undefined ? { email } : {}),
+              },
             });
           }
-        }
-        if (name !== undefined || email !== undefined) {
-          await tx.user.update({
-            where: { id: admin.userId },
-            data: {
-              ...(name !== undefined ? { name } : {}),
-              ...(email !== undefined ? { email } : {}),
+          return tx.admin.findUnique({
+            where: { id },
+            include: {
+              user: { select: { name: true, email: true, image: true } },
             },
           });
-        }
-        return tx.admin.findUnique({
-          where: { id },
-          include: { user: { select: { name: true, email: true, image: true } } },
         });
-      });
-        return updatedAdmin;
       } catch (err) {
         if (err instanceof TRPCError) {
           throw err;

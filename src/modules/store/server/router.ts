@@ -34,6 +34,7 @@ export const storeRouter = createTRPCRouter({
             where: {
               name: {
                 contains: searchQuery,
+                mode: "insensitive",
               },
             },
           }),
@@ -106,7 +107,15 @@ export const storeRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       try {
         const slug = slugify(input.name);
-
+        const store = await prisma.store.findUnique({
+          where: { id: input.id },
+        });
+        if (!store) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Store not found",
+          });
+        }
         const existingStore = await prisma.store.findFirst({
           where: {
             OR: [{ name: input.name }, { slug }],
@@ -129,12 +138,6 @@ export const storeRouter = createTRPCRouter({
           },
         });
 
-        if (!updatedStore) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Store not found",
-          });
-        }
         return updatedStore;
       } catch (err) {
         if (err instanceof TRPCError) {
