@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db";
 import { QueryMode } from "@/generated/prisma/internal/prismaNamespace";
 import { randomUUID } from "crypto";
 import { TRPCError } from "@trpc/server";
+import { dispatch } from "@/jobs/dispatcher";
+import { JobName } from "@/jobs/types";
 
 export const adminRouters = createTRPCRouter({
   list: superadminProcedure
@@ -115,11 +117,24 @@ export const adminRouters = createTRPCRouter({
               email: input.email,
             },
           });
-          return tx.admin.create({
+          const admin = await tx.admin.create({
             data: {
               userId: user.id,
             },
           });
+
+          dispatch(JobName.ADMIN_ELECTED, {
+            adminId: admin.id,
+            name: user.name,
+            email: user.email,
+          }).catch((err) =>
+            console.error(
+              "[Admin] Failed to enqueue admin-elected email:",
+              err,
+            ),
+          );
+
+          return admin;
         });
       } catch (err) {
         if (err instanceof TRPCError) {
