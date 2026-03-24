@@ -17,7 +17,7 @@ import {
   EntityTableFooter,
   EntityTableHeader,
   useEntityContextValues,
-} from "@/components/common/enitity-layout";
+} from "@/components/common/entity-layout";
 import { formatDate } from "@/lib/utils";
 
 function stringToInitials(str?: string | null) {

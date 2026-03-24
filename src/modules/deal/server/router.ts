@@ -189,6 +189,16 @@ export const dealRouter = createTRPCRouter({
           input.dealPrice,
         );
 
+        const existing = await prisma.deal.findUnique({
+          where: { id: input.id },
+        });
+        if (!existing) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Deal not found",
+          });
+        }
+
         const updatedDeal = await prisma.deal.update({
           where: { id: input.id },
           data: {

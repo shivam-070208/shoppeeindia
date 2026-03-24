@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db";
 import { QueryMode } from "@/generated/prisma/internal/prismaNamespace";
 import { randomUUID } from "crypto";
 import { TRPCError } from "@trpc/server";
+import { dispatch } from "@/jobs/dispatcher";
+import { JobName } from "@/jobs/types";
 
 export const adminRouters = createTRPCRouter({
   list: superadminProcedure
@@ -115,11 +117,24 @@ export const adminRouters = createTRPCRouter({
               email: input.email,
             },
           });
-          return tx.admin.create({
+          const admin = await tx.admin.create({
             data: {
               userId: user.id,
             },
           });
+
+          dispatch(JobName.ADMIN_ELECTED, {
+            adminId: admin.id,
+            name: user.name,
+            email: user.email,
+          }).catch((err) =>
+            console.error(
+              "[Admin] Failed to enqueue admin-elected email:",
+              err,
+            ),
+          );
+
+          return admin;
         });
       } catch (err) {
         if (err instanceof TRPCError) {
@@ -143,16 +158,16 @@ export const adminRouters = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { id, name, email } = input;
       try {
-        const admin = await prisma.admin.findUnique({
-          where: { id },
-        });
-        if (!admin) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Admin not found",
-          });
-        }
         return await prisma.$transaction(async (tx) => {
+          const admin = await tx.admin.findUnique({
+            where: { id },
+          });
+          if (!admin) {
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: "Admin not found",
+            });
+          }
           if (email !== undefined) {
             const existingUser = await tx.user.findFirst({
               where: {
@@ -176,12 +191,13 @@ export const adminRouters = createTRPCRouter({
               },
             });
           }
-          return tx.admin.findUnique({
+          const updatedAdmin = await tx.admin.findUnique({
             where: { id },
             include: {
               user: { select: { name: true, email: true, image: true } },
             },
           });
+          return updatedAdmin!;
         });
       } catch (err) {
         if (err instanceof TRPCError) {

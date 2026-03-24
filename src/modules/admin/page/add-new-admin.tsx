@@ -3,7 +3,7 @@ import {
   EntityHeader,
   EntityHeaderContent,
   EntityWrapper,
-} from "@/components/common/enitity-layout";
+} from "@/components/common/entity-layout";
 import AddAdminForm from "../components/add-admin-form";
 
 const AddNewAdmin = () => {

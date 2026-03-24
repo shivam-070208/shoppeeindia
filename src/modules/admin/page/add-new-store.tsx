@@ -2,7 +2,7 @@ import {
   EntityHeader,
   EntityHeaderContent,
   EntityWrapper,
-} from "@/components/common/enitity-layout";
+} from "@/components/common/entity-layout";
 import AddStoreForm from "@/modules/store/components/admin/add-store-form";
 
 const AddNewStore = () => {

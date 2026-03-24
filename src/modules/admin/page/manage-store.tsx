@@ -5,7 +5,7 @@ import {
   EntityHeader,
   EntityHeaderContent,
   EntityWrapper,
-} from "@/components/common/enitity-layout";
+} from "@/components/common/entity-layout";
 import StoresGrid from "@/modules/store/components/admin/store-grid";
 
 const MangeStore: React.FC = () => {

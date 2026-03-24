@@ -4,7 +4,7 @@ import {
   EntityHeader,
   EntityHeaderContent,
   EntityWrapper,
-} from "@/components/common/enitity-layout";
+} from "@/components/common/entity-layout";
 import CategoriesGrid from "@/modules/category/components/admin/category-grid";
 
 const ManageCategory: React.FC = () => (

@@ -4,7 +4,7 @@ import {
   EntityTableHeader,
   useEntityContextValues,
   EntityTable,
-} from "@/components/common/enitity-layout";
+} from "@/components/common/entity-layout";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";

@@ -3,7 +3,7 @@ import {
   EntityHeader,
   EntityHeaderContent,
   EntityWrapper,
-} from "@/components/common/enitity-layout";
+} from "@/components/common/entity-layout";
 import AddDealForm from "@/modules/deal/components/admin/add-deal-form";
 
 const AddNewDeal = () => {

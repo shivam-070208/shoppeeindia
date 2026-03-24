@@ -5,7 +5,7 @@ import {
   EntityHeader,
   EntityHeaderContent,
   EntityWrapper,
-} from "@/components/common/enitity-layout";
+} from "@/components/common/entity-layout";
 import DealsGrid from "@/modules/deal/components/admin/deal-grid";
 
 const ManageDeals: React.FC = () => {
