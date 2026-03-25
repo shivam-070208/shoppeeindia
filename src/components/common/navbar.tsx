@@ -12,9 +12,9 @@ import { getServerAdminFlags } from "@/lib/auth-utils";
 
 const links = [
   { name: "Home", href: "/" },
-  { name: "Shop", href: "/shop" },
   { name: "Deals", href: "/deals" },
-  { name: "Contact", href: "/contact" },
+  { name: "Coupons", href: "/coupons" },
+  { name: "Contact", href: "/store" },
 ];
 
 const Navbar = async () => {
