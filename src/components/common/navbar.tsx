@@ -12,17 +12,17 @@ import { getServerAdminFlags } from "@/lib/auth-utils";
 
 const links = [
   { name: "Home", href: "/" },
-  { name: "Deals", href: "/deals" },
-  { name: "Coupons", href: "/coupons" },
-  { name: "Contact", href: "/store" },
+  { name: "Deals", href: "/home/deals" },
+  { name: "Store", href: "/home/store" },
+  { name: "Coupons", href: "/home/coupons" },
 ];
 
 const Navbar = async () => {
   const { isAdmin } = await getServerAdminFlags();
 
   return (
-    <nav className="w-full border-b-2 py-3">
-      <Container maxWidth="max-w-7xl flex justify-between">
+    <nav className="sticky top-0 w-full border-b-2 py-3">
+      <Container maxWidth="max-w-7xl" className="flex justify-between">
         <div className="flex items-center gap-2">
           <Logo />
         </div>

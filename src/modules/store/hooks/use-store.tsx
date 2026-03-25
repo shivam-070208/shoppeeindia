@@ -1,9 +1,5 @@
 import { useTRPC } from "@/_trpc/lib/client";
-import {
-  useMutation,
-  useSuspenseQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 
 type StoreListInput = {
   searchQuery?: string;
@@ -13,7 +9,7 @@ type StoreListInput = {
 
 export const useStores = (params?: StoreListInput) => {
   const trpc = useTRPC();
-  return useSuspenseQuery(trpc.store.list.queryOptions(params ?? {}));
+  return useQuery(trpc.store.list.queryOptions(params ?? {}));
 };
 
 export const useUpdateStore = () => {

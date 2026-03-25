@@ -15,7 +15,7 @@ import { Input } from "../ui/input";
 import { SubHeading } from "../ui/sub-heading";
 import { Heading } from "../ui/heading";
 import { motion } from "motion/react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+
 interface EntityContextType {
   sortKey: string;
   setSortKey: (key: string) => void;
@@ -208,7 +208,7 @@ function EntityTable<T>({
 
 type EntityTableHeaderProps<T> = {
   searchPlaceHolder?: string;
-  sortOptions: (T & { value: string; label: string })[];
+  sortOptions?: (T & { value: string; label: string })[];
 };
 
 function EntityTableHeader<T>({
@@ -228,6 +228,7 @@ function EntityTableHeader<T>({
       setSearch(val);
     }, 1000);
   };
+
   return (
     <div className="flex w-full flex-col justify-between gap-4 sm:flex-row">
       {searchPlaceHolder && (
@@ -239,18 +240,20 @@ function EntityTableHeader<T>({
           onChange={onSearchChange}
         />
       )}
-      <Select value={sortKey} onValueChange={(value) => setSortKey(value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select Sort Option" />
-        </SelectTrigger>
-        <SelectContent>
-          {sortOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {Array.isArray(sortOptions) && sortOptions.length > 0 && (
+        <Select value={sortKey} onValueChange={(value) => setSortKey(value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select Sort Option" />
+          </SelectTrigger>
+          <SelectContent>
+            {sortOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
     </div>
   );
 }

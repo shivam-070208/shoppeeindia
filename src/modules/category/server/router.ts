@@ -1,12 +1,12 @@
 import { createTRPCRouter } from "@/_trpc/init";
-import { adminProcedure } from "@/_trpc/procedure/admin-procedure";
+import { adminProcedure, baseProcedure } from "@/_trpc/procedure";
 import { slugify } from "@/utils/slugify";
 import { prisma } from "@/lib/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const categoryRouter = createTRPCRouter({
-  list: adminProcedure
+  list: baseProcedure
     .input(
       z
         .object({
