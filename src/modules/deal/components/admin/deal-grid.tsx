@@ -14,7 +14,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Trash2, ExternalLink, Star, Store } from "lucide-react";
 import { formatDate, cn } from "@/lib/utils";
 import Link from "next/link";
@@ -50,7 +50,13 @@ const DealsGrid = () => {
   const { search } = useEntityContextValues();
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
+  const resetPage = useCallback(() => {
+    if (search.trim() != "") setPage(1);
+  }, [search]);
 
+  useEffect(() => {
+    resetPage();
+  }, [resetPage]);
   const { data, isPending, isError } = useListDeals({
     searchQuery: search,
     page,

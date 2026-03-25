@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useStores, useDeleteStore } from "../../hooks/use-store";
 import Link from "next/link";
 import { Trash2, ArrowUpRight } from "lucide-react";
@@ -25,7 +25,13 @@ const StoresGrid = () => {
   const { search } = useEntityContextValues();
   const [page, setPage] = useState(0);
   const [limit] = useState(10);
+  const resetPage = useCallback(() => {
+    if (search.trim() != "") setPage(1);
+  }, [search]);
 
+  useEffect(() => {
+    resetPage();
+  }, [resetPage]);
   const { data, isPending, isError } = useStores({
     searchQuery: search,
     page,
