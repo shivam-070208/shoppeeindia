@@ -21,7 +21,7 @@ const Navbar = async () => {
   const { isAdmin } = await getServerAdminFlags();
 
   return (
-    <nav className="sticky top-0 w-full border-b-2 py-3 backdrop-blur-md">
+    <nav className="sticky top-0 z-50 w-full border-b-2 py-3 backdrop-blur-md">
       <Container maxWidth="max-w-7xl" className="flex justify-between">
         <div className="flex items-center gap-2">
           <Logo />
