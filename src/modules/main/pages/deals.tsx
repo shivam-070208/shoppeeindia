@@ -1,0 +1,44 @@
+import { BreadCrumbLinks } from "@/components/common/bread-crumb-links";
+import Container from "@/components/common/container";
+import {
+  EntityContentProvider,
+  EntityHeader,
+  EntityHeaderContent,
+  EntityTableHeader,
+  EntityWrapper,
+} from "@/components/common/entity-layout";
+import {
+  DealFilterProvider,
+  DealFilterSidebar,
+} from "../components/deal-filter";
+import DealsGrid from "@/modules/deal/components/main/deals-grid";
+const Deals = () => {
+  return (
+    <div className="pt-4">
+      <Container maxWidth="max-w-7xl">
+        <EntityContentProvider>
+          <EntityWrapper className="p-0">
+            <EntityHeader>
+              <BreadCrumbLinks />
+              <EntityHeaderContent
+                heading="Top Deals for You"
+                subheading="We've handpicked the hottest offers from top retailers to help you save more today."
+              />
+            </EntityHeader>
+            <EntityTableHeader searchPlaceHolder="Search deals by name,store or category..." />
+            <DealFilterProvider>
+              <div className="grid w-full gap-2 lg:grid-cols-4">
+                <DealFilterSidebar />
+                <div className="lg:col-span-3">
+                  <DealsGrid />
+                </div>
+              </div>
+            </DealFilterProvider>
+          </EntityWrapper>
+        </EntityContentProvider>
+      </Container>
+    </div>
+  );
+};
+
+export default Deals;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -32,6 +32,13 @@ const AdminsGrid: React.FC = () => {
   const [page, setPage] = useState(1);
 
   const limit = 12;
+  const resetPage = useCallback(() => {
+    setPage(1);
+  }, [search]);
+
+  useEffect(() => {
+    resetPage();
+  }, [resetPage]);
   const { data, isLoading, isError } = useListAdmins({
     searchQuery: search,
     page,

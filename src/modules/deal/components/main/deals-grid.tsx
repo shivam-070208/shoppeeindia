@@ -1,49 +1,43 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import { useListDeals } from "@/modules/deal/hooks/use-deal";
 import {
   EntityTableFooter,
-  EntityTableHeader,
   useEntityContextValues,
 } from "@/components/common/entity-layout";
-import { useDeleteDeal, useListDeals } from "@/modules/deal/hooks/use-deal";
+import { useDealFilterContextValues } from "@/modules/main/components/deal-filter";
+import React, { useState, useCallback, useEffect } from "react";
+import { ProductCard } from "./product-card";
 import { Deal } from "../../types/deal";
-import ProductCard from "./product-card";
 
 const DealsGrid = () => {
   const { search } = useEntityContextValues();
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(12);
+  const { category, store, maxPrice } = useDealFilterContextValues();
   const resetPage = useCallback(() => {
-    if (search.trim() != "") setPage(1);
-  }, [search]);
-
+    setPage(1);
+  }, []);
   useEffect(() => {
     resetPage();
-  }, [resetPage]);
-  const { data, isPending, isError } = useListDeals({
+  }, [search, category, store, maxPrice, resetPage]);
+  const {
+    data: dealsData,
+    isPending,
+    isError,
+  } = useListDeals({
     searchQuery: search,
     page,
     limit,
+    category: category || undefined,
+    store: store && store.length > 0 ? store : undefined,
+    maxPrice: maxPrice !== undefined ? maxPrice : undefined,
   });
-
-  const deleteMutation = useDeleteDeal();
-
-  const paged = data?.items ?? [];
-  const total = data?.total ?? 0;
-  const totalPages = data?.totalPages ?? 1;
-
+  const paged = dealsData?.items ?? [];
+  const total = dealsData?.total ?? 0;
+  const totalPages = dealsData?.totalPages ?? 1;
   return (
-    <>
-      <EntityTableHeader
-        searchPlaceHolder="Search deals by store or category..."
-        sortOptions={[
-          { value: "createdAt", label: "Created" },
-          { value: "dealPrice", label: "Deal price" },
-          { value: "name", label: "Name" },
-        ]}
-      />
-
+    <div className="w-full">
       {isPending ? (
         <div className="text-muted-foreground rounded border bg-neutral-950/20 p-6 text-sm">
           Loading deals...
@@ -65,14 +59,9 @@ const DealsGrid = () => {
             </div>
           ) : (
             <>
-              <div className="mb-4 grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 xl:grid-cols-3">
-                {paged.map((row: Deal) => (
-                  <ProductCard
-                    key={row.id}
-                    deal={row}
-                    onDelete={(id) => deleteMutation.mutate({ id: id })}
-                    deleteLoading={deleteMutation.isPending}
-                  />
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                {paged.map((deal: Deal) => (
+                  <ProductCard deal={deal} key={deal.id} />
                 ))}
               </div>
               <EntityTableFooter
@@ -88,8 +77,7 @@ const DealsGrid = () => {
           )}
         </>
       )}
-    </>
+    </div>
   );
 };
-
 export default DealsGrid;

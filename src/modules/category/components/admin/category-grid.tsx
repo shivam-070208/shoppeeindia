@@ -7,7 +7,7 @@ import {
 } from "@/components/common/entity-layout";
 import { Button } from "@/components/ui/button";
 import { cn, formatDate } from "@/lib/utils";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   useListCategories,
   useDeleteCategory,
@@ -23,10 +23,16 @@ type CategoryRow = {
 };
 
 const CategoriesGrid = () => {
-  const { search } = useEntityContextValues?.() ?? { search: "" };
+  const { search } = useEntityContextValues();
   const [page, setPage] = useState(1);
   const [limit] = useState(12);
+  const resetPage = useCallback(() => {
+    if (search.trim() != "") setPage(1);
+  }, [search]);
 
+  useEffect(() => {
+    resetPage();
+  }, [resetPage]);
   const { data, isLoading, isError } = useListCategories({
     searchQuery: search,
     page,

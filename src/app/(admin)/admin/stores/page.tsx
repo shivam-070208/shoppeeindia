@@ -1,7 +1,7 @@
 import MangeStore from "@/modules/admin/page/manage-store";
 
-const Page = () => {
+const page = () => {
   return <MangeStore />;
 };
 
-export default Page;
+export default page;

@@ -1,5 +1,5 @@
 import { createTRPCRouter } from "@/_trpc/init";
-import { adminProcedure } from "@/_trpc/procedure/admin-procedure";
+import { adminProcedure, baseProcedure } from "@/_trpc/procedure";
 import { QueryMode } from "@/generated/prisma/internal/prismaNamespace";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/utils/slugify";
@@ -13,19 +13,48 @@ function computeDiscountPercent(originalPrice: number, dealPrice: number) {
 }
 
 export const dealRouter = createTRPCRouter({
-  list: adminProcedure
+  list: baseProcedure
     .input(
       z.object({
         searchQuery: z.string().default(""),
         page: z.number().int().min(1).default(1),
         limit: z.number().int().min(1).max(100).default(10),
+        category: z.string().nullable().optional(),
+        store: z.array(z.string()).optional().default([]),
+        maxPrice: z.number().optional(),
       }),
     )
     .query(async ({ input }) => {
       try {
-        const { searchQuery, page, limit } = input;
+        const {
+          searchQuery,
+          page,
+          limit,
+          category,
+          store: storeFilter,
+          maxPrice,
+        } = input;
         const trimmedQuery = searchQuery.trim();
-        const where = {
+
+        const andFilters = [];
+
+        if (typeof category === "string" && category.length > 0) {
+          andFilters.push({ categoryId: category });
+        }
+
+        if (
+          storeFilter &&
+          Array.isArray(storeFilter) &&
+          storeFilter.length > 0
+        ) {
+          andFilters.push({ storeId: { in: storeFilter } });
+        }
+
+        if (typeof maxPrice === "number" && !isNaN(maxPrice)) {
+          andFilters.push({ dealPrice: { lte: maxPrice } });
+        }
+
+        const orFilter = {
           OR: [
             {
               name: {
@@ -55,6 +84,13 @@ export const dealRouter = createTRPCRouter({
             },
           ],
         };
+
+        const where =
+          trimmedQuery.length > 0
+            ? { AND: [orFilter, ...andFilters] }
+            : andFilters.length > 0
+              ? { AND: andFilters }
+              : {};
 
         const [total, items] = await Promise.all([
           prisma.deal.count({ where }),

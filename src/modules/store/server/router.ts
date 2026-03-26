@@ -1,12 +1,12 @@
 import { createTRPCRouter } from "@/_trpc/init";
-import { adminProcedure } from "@/_trpc/procedure/admin-procedure";
+import { adminProcedure, baseProcedure } from "@/_trpc/procedure";
 import { slugify } from "@/utils/slugify";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 export const storeRouter = createTRPCRouter({
-  list: adminProcedure
+  list: baseProcedure
     .input(
       z.object({
         searchQuery: z.string().default(""),

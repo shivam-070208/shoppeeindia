@@ -11,6 +11,9 @@ type DealListInput = {
   searchQuery?: string;
   page?: number;
   limit?: number;
+  category?: string | null;
+  store?: string[];
+  maxPrice?: number;
 };
 
 export const useListDeals = (params?: DealListInput) => {
