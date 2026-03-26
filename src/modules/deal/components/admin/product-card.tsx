@@ -100,11 +100,12 @@ const ProductCard: React.FC<Props> = ({ deal, onDelete, deleteLoading }) => {
           )}
         </div>
         <div className="mt-4 flex w-full items-center justify-between gap-2">
-          <Link href={`/admin/deals/${deal.id}`}>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 justify-center rounded-full py-2 text-base font-semibold">
-              Manage Deal
-              <ExternalLink className="ml-2 h-5 w-5" strokeWidth={2} />
-            </Button>
+          <Link
+            href={`/admin/deals/${deal.id}`}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 flex flex-1 items-center justify-center rounded-full py-2 text-base font-semibold"
+          >
+            Manage Deal
+            <ExternalLink className="ml-2 h-5 w-5" strokeWidth={2} />
           </Link>
           <Button
             variant="ghost"
