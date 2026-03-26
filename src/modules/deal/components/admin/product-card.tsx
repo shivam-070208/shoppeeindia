@@ -116,6 +116,7 @@ const ProductCard: React.FC<Props> = ({ deal, onDelete, deleteLoading }) => {
             disabled={deleteLoading}
             onClick={() => onDelete(deal.id)}
             title="Delete deal"
+            aria-label="Delete deal"
           >
             <Trash2 className="h-5 w-5" />
           </Button>
