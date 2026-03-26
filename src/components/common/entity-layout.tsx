@@ -277,35 +277,81 @@ function EntityTableFooter({
 
   if (totalPages <= 1 && total <= limit) return null;
 
+  const getPages = () => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (page <= 3) {
+        pages.push(1, 2, 3, "...", totalPages);
+      } else if (page >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, "...", page - 1, page, page + 1, "...", totalPages);
+      }
+    }
+    return pages;
+  };
+
   return (
-    <div
-      className={`footer flex w-full flex-col items-center justify-between gap-2 sm:flex-row ${className}`}
-    >
+    <div className={cn("flex w-full flex-col items-center gap-2", className)}>
       <span className="text-muted-foreground text-xs select-none">
         Showing {(page - 1) * limit + 1}-{Math.min(page * limit, total)} of{" "}
         {total}
       </span>
-      <div className="flex items-center gap-2">
+      <nav className="mx-auto flex flex-row items-center gap-2">
         <Button
-          size="sm"
-          variant="outline"
+          size="icon"
+          variant="ghost"
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
+          className="h-10 w-10 rounded-full"
+          aria-label="Previous page"
         >
-          <ChevronLeftIcon className="h-4 w-4" />
+          <ChevronLeftIcon className="h-5 w-5" />
         </Button>
-        <span className="text-xs font-medium tabular-nums">
-          Page {page}/{totalPages}
-        </span>
+        {getPages().map((p, idx) =>
+          typeof p === "number" ? (
+            <Button
+              key={p}
+              size="icon"
+              variant={p === page ? "default" : "ghost"}
+              className={cn(
+                "h-10 w-10 rounded-full font-bold transition",
+                p === page
+                  ? "bg-[#ff3c1a] text-white"
+                  : "text-white/80 hover:bg-[#232323]",
+              )}
+              style={
+                p === page
+                  ? { boxShadow: "0 0 0 4px rgba(255,60,26,0.25)" }
+                  : {}
+              }
+              onClick={() => onPageChange(p)}
+              aria-current={p === page ? "page" : undefined}
+            >
+              {p}
+            </Button>
+          ) : (
+            <span
+              key={`ellipsis-${idx}`}
+              className="pointer-events-none flex h-10 w-10 items-center justify-center text-white/50 select-none"
+            >
+              ...
+            </span>
+          ),
+        )}
         <Button
-          size="sm"
-          variant="outline"
+          size="icon"
+          variant="ghost"
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
+          className="h-10 w-10 rounded-full"
+          aria-label="Next page"
         >
-          <ChevronRightIcon className="h-4 w-4" />
+          <ChevronRightIcon className="h-5 w-5" />
         </Button>
-      </div>
+      </nav>
     </div>
   );
 }

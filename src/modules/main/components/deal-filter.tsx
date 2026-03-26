@@ -153,14 +153,6 @@ const MaxPriceSlider = () => {
     setMaxPrice(Number(e.target.value));
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = Number(e.target.value.replace(/[^0-9]/g, ""));
-    if (isNaN(value)) value = PRICE_MAX;
-    if (value < PRICE_MIN) value = PRICE_MIN;
-    if (value > PRICE_MAX) value = PRICE_MAX;
-    setMaxPrice(value);
-  };
-
   return (
     <div className="mt-4 flex flex-col gap-3 p-2">
       <div className="mb-1 flex items-center justify-between gap-2">
@@ -201,7 +193,7 @@ const DealFilterSidebar = () => {
     setMaxPrice(PRICE_MAX);
   };
   return (
-    <div className="flex flex-col gap-2 rounded-md border p-4">
+    <div className="sticky top-0 hidden h-fit gap-2 rounded-md border p-4 lg:flex lg:flex-col">
       <div className="flex w-full justify-between gap-4">
         <Heading className="text-shadow-sm" as="h4">
           Filters

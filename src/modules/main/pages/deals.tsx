@@ -11,6 +11,7 @@ import {
   DealFilterProvider,
   DealFilterSidebar,
 } from "../components/deal-filter";
+import DealsGrid from "@/modules/deal/components/main/deals-grid";
 const Deals = () => {
   return (
     <div className="pt-4">
@@ -26,8 +27,11 @@ const Deals = () => {
             </EntityHeader>
             <EntityTableHeader searchPlaceHolder="Search deals by name,store or category..." />
             <DealFilterProvider>
-              <div className="grid w-full grid-cols-4">
+              <div className="grid w-full gap-2 lg:grid-cols-4">
                 <DealFilterSidebar />
+                <div className="col-span-3">
+                  <DealsGrid />
+                </div>
               </div>
             </DealFilterProvider>
           </EntityWrapper>

@@ -24,8 +24,8 @@ type CategoryRow = {
 
 const CategoriesGrid = () => {
   const { search } = useEntityContextValues();
-  const [page, setPage] = useState(12);
-  const [limit] = useState(1);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(12);
   const resetPage = useCallback(() => {
     if (search.trim() != "") setPage(1);
   }, [search]);

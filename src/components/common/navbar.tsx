@@ -21,7 +21,7 @@ const Navbar = async () => {
   const { isAdmin } = await getServerAdminFlags();
 
   return (
-    <nav className="sticky top-0 w-full border-b-2 py-3">
+    <nav className="sticky top-0 w-full border-b-2 py-3 backdrop-blur-md">
       <Container maxWidth="max-w-7xl" className="flex justify-between">
         <div className="flex items-center gap-2">
           <Logo />
@@ -32,7 +32,7 @@ const Navbar = async () => {
               <NavigationMenuItem key={link.href}>
                 <NavigationMenuLink
                   href={link.href}
-                  className="hover:text-primary focus:text-primary data-[active=true]:text-primary px-4 py-2 text-sm font-medium transition-colors"
+                  className="px-4 py-2 text-sm font-medium transition-colors"
                   active={undefined}
                 >
                   {link.name}
