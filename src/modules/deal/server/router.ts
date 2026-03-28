@@ -136,6 +136,7 @@ export const dealRouter = createTRPCRouter({
         storeId: z.string().min(1),
         categoryId: z.string().min(1),
         expiryDate: z.coerce.date(),
+        specs: z.record(z.string(), z.string()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -187,6 +188,7 @@ export const dealRouter = createTRPCRouter({
             categoryId: input.categoryId,
             createdBy: ctx.admin.id,
             expiryDate: input.expiryDate,
+            specs: input.specs ?? null,
           },
         });
       } catch (err) {

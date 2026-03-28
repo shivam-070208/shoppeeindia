@@ -20,6 +20,85 @@ import { useStores } from "@/modules/store/hooks/use-store";
 import { useListCategories } from "@/modules/category/hooks/use-category";
 import { Textarea } from "@/components/ui/textarea";
 
+type Spec = { key: string; value: string };
+
+const SpecsInput: React.FC<{
+  specs: Spec[];
+  setSpecs: (specs: Spec[]) => void;
+}> = ({ specs, setSpecs }) => {
+  const handleChange = (idx: number, field: "key" | "value", value: string) => {
+    const updated = specs.map((spec, i) =>
+      i === idx ? { ...spec, [field]: value } : spec,
+    );
+    setSpecs(updated);
+  };
+
+  const handleAdd = () => {
+    setSpecs([...specs, { key: "", value: "" }]);
+  };
+
+  const handleRemove = (idx: number) => {
+    const updated = specs.filter((_, i) => i !== idx);
+    setSpecs(updated);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <Label>Specs (optional)</Label>
+        <Button type="button" size="sm" variant="ghost" onClick={handleAdd}>
+          Add spec
+        </Button>
+      </div>
+      {specs.length === 0 ? (
+        <div className="text-xs text-neutral-400">
+          No specs added. Click &quot;Add spec&quot; to add custom features.
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {specs.map((spec, idx) => (
+            <div className="flex items-center gap-2" key={idx}>
+              <Input
+                className="w-2/5"
+                placeholder="Key (Ex: RAM)"
+                value={spec.key}
+                onChange={(e) => handleChange(idx, "key", e.target.value)}
+              />
+              <Input
+                className="w-3/5"
+                placeholder="Value (Ex: 16GB DDR4)"
+                value={spec.value}
+                onChange={(e) => handleChange(idx, "value", e.target.value)}
+              />
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={() => handleRemove(idx)}
+                aria-label="Remove specification"
+              >
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                  <path
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M7 7l6 6M13 7l-6 6"
+                  />
+                </svg>
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+      <p className="text-xs text-neutral-400">
+        You can add any key-value specs, such as &quot;RAM: 16GB&quot; or
+        &quot;Color: Red&quot;. Leave empty if not needed.
+      </p>
+    </div>
+  );
+};
+
 type StoreAndCategorySelectsProps = {
   storeId: string;
   setStoreId: (v: string) => void;
@@ -99,6 +178,7 @@ const AddDealForm: React.FC = () => {
   const [expiryDate, setExpiryDate] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [specs, setSpecs] = useState<Spec[]>([]);
 
   const isBusy = isUploading || createMutation.isPending;
 
@@ -143,6 +223,12 @@ const AddDealForm: React.FC = () => {
           dealPrice: deal,
           affiliateUrl: affiliateUrl.trim(),
           expiryDate,
+          specs: specs
+            .filter((s) => !!s.key.trim() && !!s.value.trim())
+            .reduce<Record<string, string>>((acc, s) => {
+              acc[s.key.trim()] = s.value.trim();
+              return acc;
+            }, {}),
         },
         {
           onSuccess: async () => {
@@ -204,6 +290,8 @@ const AddDealForm: React.FC = () => {
               setCategoryId={setCategoryId}
             />
           </Suspense>
+
+          <SpecsInput specs={specs} setSpecs={setSpecs} />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">

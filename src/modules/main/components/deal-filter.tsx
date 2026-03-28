@@ -193,7 +193,7 @@ const DealFilterSidebar = () => {
     setMaxPrice(PRICE_MAX);
   };
   return (
-    <div className="sticky top-0 hidden h-fit gap-2 rounded-md border p-4 lg:flex lg:flex-col">
+    <div className="sticky top-20 hidden h-fit gap-2 rounded-md border p-4 lg:flex lg:flex-col">
       <div className="flex w-full justify-between gap-4">
         <Heading className="text-shadow-sm" as="h4">
           Filters

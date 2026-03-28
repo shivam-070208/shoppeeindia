@@ -78,13 +78,15 @@ const ProductCard = ({ deal }: { deal: Deal }) => {
         <CardDescription className="text-muted-foreground mb-2 truncate text-sm">
           {deal.description ? deal.description : "No description available."}
         </CardDescription>
-        <div className="flex items-end gap-2">
-          <span className="text-card-foreground text-2xl leading-tight font-extrabold">
-            {formatMoney(deal.dealPrice)}
-          </span>
-          <span className="text-muted-foreground text-base font-medium line-through">
-            {formatMoney(deal.originalPrice)}
-          </span>
+        <div className="flex flex-wrap justify-between">
+          <div className="flex gap-1">
+            <span className="text-card-foreground text-sm leading-tight font-extrabold">
+              {formatMoney(deal.dealPrice)}
+            </span>
+            <span className="text-muted-foreground text-xs font-medium line-through">
+              {formatMoney(deal.originalPrice)}
+            </span>
+          </div>
           {deal.discountPercent > 0 && (
             <span className="bg-accent text-accent-foreground ml-2 rounded-full px-2 py-[2px] text-xs font-bold">
               -{deal.discountPercent}%
@@ -93,15 +95,14 @@ const ProductCard = ({ deal }: { deal: Deal }) => {
         </div>
         <div className="mt-4 flex w-full items-center justify-between gap-2">
           <Link
-            href={`/deals/${deal.id}`}
+            href={`./deals/${deal.id}`}
             className="bg-primary text-primary-foreground hover:bg-primary/90 flex flex-1 items-center justify-center rounded-full py-2 text-center text-base font-semibold"
           >
             View Deal
             <ExternalLink className="ml-2 h-5 w-5" strokeWidth={2} />
           </Link>
         </div>
-        <div className="text-muted-foreground mt-2 flex justify-between gap-2 text-xs">
-          <span>Created: {formatDate(String(deal.createdAt))}</span>
+        <div className="text-muted-foreground mt-2 flex justify-between text-xs">
           {deal.expiryDate && (
             <span>Expires: {formatDate(String(deal.expiryDate))}</span>
           )}
