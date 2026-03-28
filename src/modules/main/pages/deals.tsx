@@ -29,7 +29,7 @@ const Deals = () => {
             <DealFilterProvider>
               <div className="grid w-full gap-2 lg:grid-cols-4">
                 <DealFilterSidebar />
-                <div className="col-span-3">
+                <div className="lg:col-span-3">
                   <DealsGrid />
                 </div>
               </div>

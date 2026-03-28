@@ -33,7 +33,7 @@ const AdminsGrid: React.FC = () => {
 
   const limit = 12;
   const resetPage = useCallback(() => {
-    if (search.trim() != "") setPage(1);
+    setPage(1);
   }, [search]);
 
   useEffect(() => {
