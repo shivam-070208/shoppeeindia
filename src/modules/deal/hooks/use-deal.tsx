@@ -3,8 +3,9 @@
 import { useTRPC } from "@/_trpc/lib/client";
 import {
   useMutation,
-  useSuspenseQuery,
+  useQuery,
   useQueryClient,
+  useSuspenseQuery,
 } from "@tanstack/react-query";
 
 type DealListInput = {
@@ -32,6 +33,34 @@ export const useCreateDeal = () => {
           queryKey: trpc.deal.list.queryKey(),
         });
       },
+    }),
+  );
+};
+
+export const useDealById = (id: string) => {
+  const trpc = useTRPC();
+  return useQuery(
+    trpc.deal.byId.queryOptions(
+      { id },
+      {
+        enabled: Boolean(id),
+      },
+    ),
+  );
+};
+
+type RelatedDealsInput = {
+  dealId: string;
+  categoryId?: string;
+  storeId?: string;
+  limit?: number;
+};
+
+export const useRelatedDeals = (params: RelatedDealsInput) => {
+  const trpc = useTRPC();
+  return useQuery(
+    trpc.deal.related.queryOptions(params, {
+      enabled: Boolean(params.dealId),
     }),
   );
 };

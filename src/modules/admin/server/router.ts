@@ -101,12 +101,40 @@ export const adminRouters = createTRPCRouter({
           const existingUser = await tx.user.findUnique({
             where: { email: input.email },
           });
+
           if (existingUser) {
-            throw new TRPCError({
-              code: "CONFLICT",
-              message: "User already exists",
-              cause: "A user with this email is already registered.",
+            const existingAdmin = await tx.admin.findFirst({
+              where: {
+                userId: existingUser.id,
+              },
             });
+
+            if (existingAdmin) {
+              throw new TRPCError({
+                code: "CONFLICT",
+                message: "User is already an admin",
+                cause: "A user with this email is already an admin.",
+              });
+            }
+
+            const admin = await tx.admin.create({
+              data: {
+                userId: existingUser.id,
+              },
+            });
+
+            dispatch(JobName.ADMIN_ELECTED, {
+              adminId: admin.id,
+              name: existingUser.name,
+              email: existingUser.email,
+            }).catch((err) =>
+              console.error(
+                "[Admin] Failed to enqueue admin-elected email:",
+                err,
+              ),
+            );
+
+            return admin;
           }
 
           const userId = randomUUID();
@@ -137,6 +165,7 @@ export const adminRouters = createTRPCRouter({
           return admin;
         });
       } catch (err) {
+        console.log(err);
         if (err instanceof TRPCError) {
           throw err;
         }

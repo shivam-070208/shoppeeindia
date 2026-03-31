@@ -9,6 +9,7 @@ export type Deal = {
   affiliateUrl: string;
   expiryDate: string | Date;
   createdAt: string | Date;
+  specs?: Record<string, string> | null;
   storeId: string;
   categoryId: string;
   store?: { id: string; name: string; slug: string; logoUrl: string };

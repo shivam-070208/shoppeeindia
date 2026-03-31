@@ -95,7 +95,7 @@ const ProductCard = ({ deal }: { deal: Deal }) => {
         </div>
         <div className="mt-4 flex w-full items-center justify-between gap-2">
           <Link
-            href={`./deals/${deal.id}`}
+            href={`/home/deals/${deal.id}`}
             className="bg-primary text-primary-foreground hover:bg-primary/90 flex flex-1 items-center justify-center rounded-full py-2 text-center text-base font-semibold"
           >
             View Deal

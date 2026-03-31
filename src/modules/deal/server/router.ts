@@ -123,6 +123,111 @@ export const dealRouter = createTRPCRouter({
         });
       }
     }),
+  byId: baseProcedure
+    .input(
+      z.object({
+        id: z.string().min(1),
+      }),
+    )
+    .query(async ({ input }) => {
+      try {
+        const item = await prisma.deal.findUnique({
+          where: { id: input.id },
+          include: {
+            store: {
+              select: { id: true, name: true, slug: true, logoUrl: true },
+            },
+            category: { select: { id: true, name: true, slug: true } },
+          },
+        });
+
+        if (!item) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Deal not found",
+          });
+        }
+
+        return item;
+      } catch (err) {
+        if (err instanceof TRPCError) {
+          throw err;
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch deal",
+          cause: err instanceof Error ? err.message : undefined,
+        });
+      }
+    }),
+  related: baseProcedure
+    .input(
+      z.object({
+        dealId: z.string().min(1),
+        categoryId: z.string().optional(),
+        storeId: z.string().optional(),
+        limit: z.number().int().min(1).max(12).default(4),
+      }),
+    )
+    .query(async ({ input }) => {
+      try {
+        const { dealId, categoryId, storeId, limit } = input;
+        const relatedWhere =
+          categoryId || storeId
+            ? {
+                id: { not: dealId },
+                OR: [
+                  ...(categoryId ? [{ categoryId }] : []),
+                  ...(storeId ? [{ storeId }] : []),
+                ],
+              }
+            : {
+                id: { not: dealId },
+              };
+
+        const relatedItems = await prisma.deal.findMany({
+          where: relatedWhere,
+          orderBy: { createdAt: "desc" },
+          include: {
+            store: {
+              select: { id: true, name: true, slug: true, logoUrl: true },
+            },
+            category: { select: { id: true, name: true, slug: true } },
+          },
+          take: limit,
+        });
+
+        if (relatedItems.length >= limit) {
+          return relatedItems;
+        }
+
+        const usedIds = new Set<string>([
+          dealId,
+          ...relatedItems.map((d) => d.id),
+        ]);
+        const fallbackItems = await prisma.deal.findMany({
+          where: {
+            id: { notIn: Array.from(usedIds) },
+          },
+          orderBy: { createdAt: "desc" },
+          include: {
+            store: {
+              select: { id: true, name: true, slug: true, logoUrl: true },
+            },
+            category: { select: { id: true, name: true, slug: true } },
+          },
+          take: limit - relatedItems.length,
+        });
+
+        return [...relatedItems, ...fallbackItems];
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to list related deals",
+          cause: err instanceof Error ? err.message : undefined,
+        });
+      }
+    }),
 
   create: adminProcedure
     .input(
