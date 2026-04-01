@@ -2,7 +2,7 @@ import { getServerAdminFlags } from "@/lib/auth-utils";
 import AdminNavbar from "@/modules/admin/components/navbar";
 import AdminSidebar from "@/modules/admin/components/sidebar";
 import { forbidden } from "next/navigation";
-
+export const dynamic = "force-dynamic";
 export default async function Layout({
   children,
 }: {

@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 import { slugify } from "@/utils/slugify";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
+import { Deal } from "../types/deal";
 function computeDiscountPercent(originalPrice: number, dealPrice: number) {
   if (originalPrice <= 0) return 0;
   const raw = ((originalPrice - dealPrice) / originalPrice) * 100;
@@ -126,7 +126,7 @@ export const dealRouter = createTRPCRouter({
         ]);
 
         return {
-          items,
+          items: items as Deal[],
           total,
           page,
           limit,

@@ -66,7 +66,7 @@ const DealsGrid = () => {
           ) : (
             <>
               <div className="mb-4 grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 xl:grid-cols-3">
-                {paged.map((row: Deal) => (
+                {paged.map((row) => (
                   <ProductCard
                     key={row.id}
                     deal={row}
