@@ -12,6 +12,13 @@ export const useStores = (params?: StoreListInput) => {
   return useQuery(trpc.store.list.queryOptions(params ?? {}));
 };
 
+export const useStoreById = (id: string) => {
+  const trpc = useTRPC();
+  return useQuery(
+    trpc.store.byId.queryOptions({ id }, { enabled: Boolean(id?.trim()) }),
+  );
+};
+
 export const useUpdateStore = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
