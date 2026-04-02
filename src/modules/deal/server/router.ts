@@ -5,12 +5,14 @@ import { prisma } from "@/lib/db";
 import { slugify } from "@/utils/slugify";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
+import { Deal } from "../types/deal";
 function computeDiscountPercent(originalPrice: number, dealPrice: number) {
   if (originalPrice <= 0) return 0;
   const raw = ((originalPrice - dealPrice) / originalPrice) * 100;
   return Math.max(0, Math.min(100, Math.round(raw)));
 }
+
+const FLASH_SALE_HOURS = 72;
 
 export const dealRouter = createTRPCRouter({
   list: baseProcedure
@@ -22,6 +24,7 @@ export const dealRouter = createTRPCRouter({
         category: z.string().nullable().optional(),
         store: z.array(z.string()).optional().default([]),
         maxPrice: z.number().optional(),
+        flashSaleOnly: z.boolean().optional(),
       }),
     )
     .query(async ({ input }) => {
@@ -33,6 +36,7 @@ export const dealRouter = createTRPCRouter({
           category,
           store: storeFilter,
           maxPrice,
+          flashSaleOnly,
         } = input;
         const trimmedQuery = searchQuery.trim();
 
@@ -52,6 +56,19 @@ export const dealRouter = createTRPCRouter({
 
         if (typeof maxPrice === "number" && !isNaN(maxPrice)) {
           andFilters.push({ dealPrice: { lte: maxPrice } });
+        }
+
+        if (flashSaleOnly) {
+          const now = new Date();
+          const flashEnd = new Date(
+            now.getTime() + FLASH_SALE_HOURS * 60 * 60 * 1000,
+          );
+          andFilters.push({
+            expiryDate: {
+              gt: now,
+              lte: flashEnd,
+            },
+          });
         }
 
         const orFilter = {
@@ -109,7 +126,7 @@ export const dealRouter = createTRPCRouter({
         ]);
 
         return {
-          items,
+          items: items as Deal[],
           total,
           page,
           limit,

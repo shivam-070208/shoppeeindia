@@ -13,7 +13,7 @@ import { getServerAdminFlags } from "@/lib/auth-utils";
 const links = [
   { name: "Home", href: "/" },
   { name: "Deals", href: "/home/deals" },
-  { name: "Store", href: "/home/store" },
+  { name: "Store", href: "/stores" },
   { name: "Coupons", href: "/home/coupons" },
 ];
 

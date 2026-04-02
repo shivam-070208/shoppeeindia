@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
+const FLASH_SALE_HOURS = 72;
+
 export const storeRouter = createTRPCRouter({
   list: baseProcedure
     .input(
@@ -29,6 +31,9 @@ export const storeRouter = createTRPCRouter({
             orderBy: { createdAt: "desc" },
             skip: page * limit,
             take: limit,
+            include: {
+              _count: { select: { deals: true } },
+            },
           }),
           prisma.store.count({
             where: {
@@ -51,6 +56,86 @@ export const storeRouter = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to list stores",
+          cause: err instanceof Error ? err.message : undefined,
+        });
+      }
+    }),
+
+  byId: baseProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .query(async ({ input }) => {
+      try {
+        const store = await prisma.store.findUnique({
+          where: { id: input.id },
+        });
+        if (!store) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Store not found",
+          });
+        }
+
+        const now = new Date();
+        const flashBefore = new Date(
+          now.getTime() + FLASH_SALE_HOURS * 60 * 60 * 1000,
+        );
+
+        const [activeDeals, flashSaleDeals, categoriesRows] = await Promise.all(
+          [
+            prisma.deal.count({
+              where: { storeId: input.id, expiryDate: { gt: now } },
+            }),
+            prisma.deal.count({
+              where: {
+                storeId: input.id,
+                expiryDate: { gt: now, lte: flashBefore },
+              },
+            }),
+            prisma.deal.findMany({
+              where: { storeId: input.id },
+              select: {
+                category: {
+                  select: { id: true, name: true, slug: true },
+                },
+              },
+            }),
+          ],
+        );
+
+        const categoryMap = new Map<
+          string,
+          { id: string; name: string; slug: string }
+        >();
+        for (const row of categoriesRows) {
+          if (row.category) {
+            categoryMap.set(row.category.id, row.category);
+          }
+        }
+        const categories = [...categoryMap.values()].sort((a, b) =>
+          a.name.localeCompare(b.name),
+        );
+
+        return {
+          id: store.id,
+          name: store.name,
+          slug: store.slug,
+          logoUrl: store.logoUrl,
+          createdAt: store.createdAt,
+          stats: {
+            activeDeals,
+            flashSaleDeals,
+            vouchersAvailable: 0,
+            rating: null as number | null,
+          },
+          categories,
+        };
+      } catch (err) {
+        if (err instanceof TRPCError) {
+          throw err;
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch store",
           cause: err instanceof Error ? err.message : undefined,
         });
       }

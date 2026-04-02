@@ -15,11 +15,24 @@ type DealListInput = {
   category?: string | null;
   store?: string[];
   maxPrice?: number;
+  flashSaleOnly?: boolean;
 };
 
 export const useListDeals = (params?: DealListInput) => {
   const trpc = useTRPC();
   return useSuspenseQuery(trpc.deal.list.queryOptions(params ?? {}));
+};
+
+export const useListDealsQuery = (
+  params?: DealListInput,
+  options?: { enabled?: boolean },
+) => {
+  const trpc = useTRPC();
+  return useQuery(
+    trpc.deal.list.queryOptions(params ?? {}, {
+      enabled: options?.enabled ?? true,
+    }),
+  );
 };
 
 export const useCreateDeal = () => {
